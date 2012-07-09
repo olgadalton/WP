@@ -18,7 +18,6 @@
     int allNeededCount;
     
     NSMutableArray *tempDataHolder;
-    NSMutableArray *newTempDataHolder;
     
     int inQue;
     
@@ -26,7 +25,7 @@
 }
 
 @property (nonatomic, retain) RequestsHandler *handler;
-@property (nonatomic, retain) NSMutableArray *tempDataHolder, *newTempDataHolder;
+@property (nonatomic, retain) NSMutableArray *tempDataHolder;
 @property (nonatomic, retain) NSMutableArray *allData;
 
 -(void) loadRadiosListAndSave;
@@ -38,7 +37,6 @@
 
 -(void) listDataFailedWithError: (NSString *) errorDescription;
 
--(void) loadStationdetails;
 -(void) loadStationsDataFromCache;
 
 @end

@@ -19,3 +19,8 @@
 
 #define RADIO_LIST_API_URL @"http://api.yes.com/1/stations?max=100000"
 #define STATION_INFO @"http://api.yes.com/1/station?name=%@"
+
+#define API_KEY @"220c973a3e9e2e7cce262afc1338eebb3b603d83"
+
+#define CATEGORIES_LIST @"http://dirble.com/dirapi/categories/apikey/%@"
+#define STATIONS_LIST @"http://dirble.com/dirapi/stations/apikey/%@/id/%@"

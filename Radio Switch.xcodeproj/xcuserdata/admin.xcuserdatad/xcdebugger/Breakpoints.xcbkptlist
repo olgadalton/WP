@@ -9,20 +9,6 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Radio Switch/RequestsManager.m"
-         timestampString = "363450662.779046"
-         startingColumnNumber = "2147483647"
-         endingColumnNumber = "2147483647"
-         startingLineNumber = "209"
-         endingLineNumber = "209"
-         landmarkName = "-loadStationdetails"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         isPathRelative = "1"
-         filePath = "Radio Switch/RequestsManager.m"
          timestampString = "363447679.930989"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"

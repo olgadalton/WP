@@ -11,7 +11,7 @@
 #import "JSONKit.h"
 
 @implementation RequestsManager
-@synthesize handler, tempDataHolder, allData, newTempDataHolder;
+@synthesize handler, tempDataHolder, allData;
 
 static RequestsManager *sharedRequestsManager = nil;
 
@@ -61,7 +61,7 @@ static RequestsManager *sharedRequestsManager = nil;
         
         self.handler.myGenreId = nil;
         
-        [self.handler loadDataWithPostData:nil andURL:RADIO_LIST_API_URL 
+        [self.handler loadDataWithPostData:nil andURL: [NSString stringWithFormat: CATEGORIES_LIST, API_KEY]
                              andHTTPMethod:@"GET" 
                             andContentType:@"application/json" andAuthorization:nil];
     }
@@ -78,223 +78,103 @@ static RequestsManager *sharedRequestsManager = nil;
     {
         NSError *error = nil;
         
-        NSDictionary *jsonData = [data objectFromJSONStringWithParseOptions:JKParseOptionLooseUnicode error:&error];
+        NSArray *jsonData = [data objectFromJSONStringWithParseOptions:JKParseOptionLooseUnicode error:&error];
         
         if (jsonData) 
         {
-            NSMutableArray *stations = [NSMutableArray arrayWithArray: [jsonData objectForKey: @"stations"]];
-            
-            int allCount = [stations count];
-            
-            int filesNum = allNeededCount = (int)(allCount / 500) + 1;
-            
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"databaseLoaded"];
-            [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey: @"lastLoaded"];
+            self.tempDataHolder = [NSMutableArray arrayWithArray: jsonData];
+
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey: @"databaseLoaded"];
+            [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"lastLoaded"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             
-            for(int i = 0; i < filesNum; i++)
+            for (NSDictionary *category in self.tempDataHolder) 
             {
-                NSArray *subArray = [stations subarrayWithRange: NSMakeRange(i * 500, MIN([stations count] - (i * 500), 500))];
+                inQue++;
                 
-                NSString *filePath = [[SHARED_DELEGATE applicationDocumentsDirectory]
-                                      stringByAppendingPathComponent: [NSString stringWithFormat:@"cache%d.dat", i]];
+                NSNumber *catId = [category objectForKey: @"id"];
                 
-                if([[NSFileManager defaultManager] fileExistsAtPath: filePath])
-                {
-                    [[NSFileManager defaultManager] removeItemAtPath:filePath error: nil];
-                }
+                NSString *categoryPath = [NSString stringWithFormat: STATIONS_LIST, API_KEY, catId];
                 
-                [[NSFileManager defaultManager] createFileAtPath:filePath 
-                                                        contents:[NSKeyedArchiver archivedDataWithRootObject:subArray]
-                                                      attributes:nil];
+                RequestsHandler *rHandler = [[RequestsHandler alloc] initWithDelegate:self andErrorSelector:@selector(listDataFailedWithError:) andSuccessSelector:@selector(firstListLoadedWithData:andInfo:)];
                 
-                NSLog(@"file exists at path after writing - %d / %@", [[NSFileManager defaultManager] 
-                                                                       fileExistsAtPath: filePath], filePath);
+                rHandler.myGenreId = [NSString stringWithFormat: @"%@", catId];
+                
+                [rHandler loadDataWithPostData:nil andURL:categoryPath andHTTPMethod:@"GET" andContentType:@"application/json" andAuthorization:nil];
             }
-            
-            currentlyLoaded = 0;
-            
-            [self loadStationdetails];
-        }
-        else
-        {
-            [self loadStationsDataFromCache];
         }
     }
     else
     {
         inQue--;
         
-        NSLog(@"in que - %d", inQue);
+        NSArray *stationsList = [data objectFromJSONStringWithParseOptions:JKParseOptionLooseUnicode error:nil];
         
-        NSDictionary *stationInfo = [data objectFromJSONStringWithParseOptions:JKParseOptionLooseUnicode error:nil];
-        
-        if (stationInfo) 
+        if (stationsList) 
         {
-            if ([stationInfo objectForKey: @"audiostream"]) 
+            NSNumber *stId = [NSNumber numberWithInt: [[info objectForKey:@"stID"] intValue]];
+            
+            NSDictionary *toReplace = nil;
+            
+            for (NSDictionary *category in self.tempDataHolder) 
             {
-                NSString *name = [stationInfo objectForKey: @"name"];
-                
-                NSDictionary *stationDictionary = nil;
-                
-                NSInteger index = -10;
-                
-                for (NSDictionary *dict in self.tempDataHolder) 
+                if ([[category objectForKey: @"id"] isEqual:stId]) 
                 {
-                    if ([dict objectForKey: @"name"] &&
-                        ![[dict objectForKey: @"name"] isEqual: [NSNull null]] 
-                        && [[dict objectForKey: @"name"] isEqualToString: name]) 
-                    {
-                        stationDictionary = dict;
-                        index = [self.tempDataHolder indexOfObject: dict];
-                        break;
-                    }
-                }
-                
-                if (stationDictionary && 
-                    [stationInfo objectForKey: @"audiostream"] &&
-                    ![[stationInfo objectForKey: @"audiostream"] isEqual: [NSNull null]])
-                {
-                    NSMutableDictionary *replacementDict = [NSMutableDictionary dictionaryWithDictionary: stationDictionary];
-                    
-                    [replacementDict setObject:
-                                    [stationInfo objectForKey: @"audiostream"] 
-                                        forKey: @"audiostream"];
-                    
-                    [self.newTempDataHolder addObject: replacementDict];
+                    toReplace = category;
+                    break;
                 }
             }
             
-            if (inQue <= 0) 
+            if (toReplace) 
             {
-                NSString *filePath = [[SHARED_DELEGATE applicationDocumentsDirectory]
-                                      stringByAppendingPathComponent: [NSString stringWithFormat:@"cache%d.dat", currentlyLoaded]];
+                NSMutableDictionary *newDict = [NSMutableDictionary dictionaryWithDictionary: toReplace];
+                [newDict setObject:stationsList forKey: @"stations"];
                 
-                if ([[NSFileManager defaultManager] fileExistsAtPath: filePath]) 
-                {
-                    [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-                }
-                
-                NSLog(@"WRITING CACHE FILE TO PATH - %@", filePath);
-                
-                NSLog(@"tempdataholder - %@", self.newTempDataHolder);
-                
-                
-                [[NSFileManager defaultManager] createFileAtPath:filePath 
-                                                        contents:[NSKeyedArchiver archivedDataWithRootObject: self.newTempDataHolder]
-                                                      attributes:nil];
-                self.tempDataHolder = nil;
-                self.newTempDataHolder = nil;
-                
-                currentlyLoaded++;
-                [self loadStationdetails];
+                [self.tempDataHolder replaceObjectAtIndex: 
+                                    [self.tempDataHolder indexOfObject: toReplace] 
+                                               withObject: newDict];
             }
         }
-        else
+        
+        if (inQue <= 0) 
         {
-            // just skip, nothing to do
-            // ??
+            NSString *filePath = [[SHARED_DELEGATE applicationDocumentsDirectory] stringByAppendingPathComponent: @"cache.dat"];
+            
+            if ([[NSFileManager defaultManager] fileExistsAtPath: filePath]) 
+            {
+                [[NSFileManager defaultManager] removeItemAtPath: filePath error: nil];
+            }
+            
+            NSData *cacheData = [NSKeyedArchiver archivedDataWithRootObject: self.tempDataHolder];
+            [[NSFileManager defaultManager] createFileAtPath:filePath contents:cacheData attributes:nil];
+            
+            self.tempDataHolder = nil;
+            [self loadStationsDataFromCache];
         }
     }
     
     if ([info objectForKey:@"handler"]) 
     {
-        RequestsHandler *rHandler = [info objectForKey:@"handler"];
+        RequestsHandler *rHandler = (RequestsHandler *) [info objectForKey:@"handler"];
         [rHandler release];
-    }
-}
-
--(void) loadStationdetails
-{
-    if (currentlyLoaded < allNeededCount) 
-    {
-        NSString *filePath = [[SHARED_DELEGATE applicationDocumentsDirectory]
-                              stringByAppendingPathComponent: [NSString stringWithFormat:@"cache%d.dat", currentlyLoaded]];
-        
-        NSLog(@"file exists at path before reading - %d / %@", [[NSFileManager defaultManager] 
-                                                               fileExistsAtPath: filePath], filePath);
-        
-        if (![[NSFileManager defaultManager] fileExistsAtPath: filePath]) 
-        {
-            currentlyLoaded++;
-            [self loadStationdetails];
-        }
-        else
-        {
-            NSArray *arrayFromFile = [NSKeyedUnarchiver unarchiveObjectWithData: [NSData dataWithContentsOfFile: filePath]];
-            
-            self.tempDataHolder = [NSMutableArray arrayWithArray: arrayFromFile];
-            
-            inQue = 0;
-            
-            self.newTempDataHolder = nil;
-            self.newTempDataHolder = [NSMutableArray array];
-            
-            for (NSDictionary *station in self.tempDataHolder) 
-            {
-                NSString *name = [station objectForKey: @"name"];
-                
-                NSString *stationUrlToLoad = [[NSString stringWithFormat: STATION_INFO, name]
-                                                        stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
-                
-                RequestsHandler *rHandler = [[RequestsHandler alloc] initWithDelegate:self andErrorSelector:@selector(listDataFailedWithError:) andSuccessSelector:@selector(firstListLoadedWithData:andInfo:)];
-                
-                rHandler.myGenreId = name;
-                
-                [rHandler loadDataWithPostData:nil 
-                                        andURL:stationUrlToLoad 
-                                 andHTTPMethod:@"GET" 
-                                andContentType:@"application/json" 
-                              andAuthorization:nil];
-                
-                inQue++;
-            }
-        }
-    }
-    else
-    {
-        NSLog(@"Everything is loaded! Juhhuuuu!");
-        
-        [self loadStationsDataFromCache];
     }
 }
 
 -(void) loadStationsDataFromCache
 {
-    int max = 10000;
-    
     self.allData = [NSMutableArray array];
     
-    for(int i = 0; i < max; i++)
-    {
-        NSString *filePath = [[SHARED_DELEGATE applicationDocumentsDirectory]
-                                    stringByAppendingPathComponent: 
-                              [NSString stringWithFormat:@"cache%d.dat", i]];
-        
-        NSLog(@"filePath - %@", filePath);
-        
-        if (![[NSFileManager defaultManager] fileExistsAtPath: filePath]) 
-        {
-            break;
-        }
-        else
-        {
-            NSData *arrayData = [NSData dataWithContentsOfFile:filePath options:nil error:nil];
-            
-            if (arrayData) 
-            {
-                NSArray *fileArray = [NSKeyedUnarchiver unarchiveObjectWithData: arrayData];
-                
-                if (fileArray) 
-                {
-                    [self.allData addObjectsFromArray: fileArray];
-                }
-            }
-        }
-    }
+    NSString *filePath = [[SHARED_DELEGATE applicationDocumentsDirectory] stringByAppendingPathComponent: @"cache.dat"];
     
-    NSLog(@"FINAL STATIONS COUNT: %d", [self.allData count]);
-    NSLog(@"STATIONS PRINT OUT: %@", self.allData);
+    if ([[NSFileManager defaultManager] fileExistsAtPath: filePath]) 
+    {
+        self.allData = [NSMutableArray arrayWithArray: [NSKeyedUnarchiver unarchiveObjectWithFile: filePath]];
+    }
+    else
+    {
+        NSString *cachePath = [[NSBundle mainBundle] pathForResource:@"cache" ofType:@"dat"];
+        self.allData = [NSMutableArray arrayWithArray: [NSKeyedUnarchiver unarchiveObjectWithFile: cachePath]];
+    }
 }
 
 -(void) listDataFailedWithError: (NSString *) errorDescription
