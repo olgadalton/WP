@@ -13,9 +13,16 @@
     IBOutlet UIView *separatorView;
     
     IBOutlet UILabel *numberLabel;
+    
+    IBOutlet UILabel *cellTitleLabel;
+    
+    IBOutlet UILabel *lastPlayedLabel;
 }
 
 @property (nonatomic, retain) IBOutlet UIView *separatorView;
 @property (nonatomic, retain) IBOutlet UILabel *numberLabel;
+
+@property (nonatomic, retain) IBOutlet UILabel *cellTitleLabel;
+@property (nonatomic, retain) IBOutlet UILabel *lastPlayedLabel;
 
 @end

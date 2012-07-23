@@ -49,6 +49,8 @@ static RequestsManager *sharedRequestsManager = nil;
 
 -(void) loadRadiosListAndSave
 {
+    [self loadStationsDataFromCache];
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     BOOL loadedOneTime = [defaults boolForKey: @"databaseLoaded"];
@@ -65,10 +67,10 @@ static RequestsManager *sharedRequestsManager = nil;
                              andHTTPMethod:@"GET" 
                             andContentType:@"application/json" andAuthorization:nil];
     }
-    else 
-    {
-        [self loadStationsDataFromCache];
-    }
+//    else 
+//    {
+//        [self loadStationsDataFromCache];
+//    }
 }
 
 -(void) firstListLoadedWithData: (NSString *) data 
@@ -175,6 +177,25 @@ static RequestsManager *sharedRequestsManager = nil;
         NSString *cachePath = [[NSBundle mainBundle] pathForResource:@"cache" ofType:@"dat"];
         self.allData = [NSMutableArray arrayWithArray: [NSKeyedUnarchiver unarchiveObjectWithFile: cachePath]];
     }
+    
+    NSMutableArray *withStations = [NSMutableArray array];
+    
+    for (NSDictionary *category in self.allData) 
+    {
+        if ([[category objectForKey:@"stations"] count] > 1) 
+        {
+            [withStations addObject: category];
+        }
+        else if ([[category objectForKey:@"stations"] count] == 1) 
+        {
+            if ([[[category objectForKey:@"stations"] objectAtIndex: 0] isKindOfClass:[NSDictionary class]]) 
+            {
+                [withStations addObject: category];
+            }
+        }
+    }
+    
+    self.allData = withStations;
 }
 
 -(void) listDataFailedWithError: (NSString *) errorDescription

@@ -8,13 +8,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          isPathRelative = "1"
-         filePath = "Radio Switch/RequestsManager.m"
-         timestampString = "363447679.930989"
+         filePath = "Radio Switch/StationsListViewController.m"
+         timestampString = "364762794.516596"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"
-         startingLineNumber = "52"
-         endingLineNumber = "52"
-         landmarkName = "-loadRadiosListAndSave"
+         startingLineNumber = "304"
+         endingLineNumber = "304"
+         landmarkName = "-tableView:numberOfRowsInSection:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -22,13 +22,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          isPathRelative = "1"
-         filePath = "Radio Switch/RequestsManager.m"
-         timestampString = "363447683.393744"
+         filePath = "Radio Switch/StationsListViewController.m"
+         timestampString = "364762794.516596"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"
-         startingLineNumber = "77"
-         endingLineNumber = "77"
-         landmarkName = "-firstListLoadedWithData:andInfo:"
+         startingLineNumber = "112"
+         endingLineNumber = "112"
+         landmarkName = "-tableView:cellForRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

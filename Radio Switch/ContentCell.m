@@ -10,5 +10,6 @@
 
 @implementation ContentCell
 @synthesize separatorView, numberLabel;
+@synthesize cellTitleLabel, lastPlayedLabel;
 
 @end

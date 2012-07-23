@@ -13,7 +13,7 @@
 
 @implementation SelectViewController
 
-@synthesize tbView;
+@synthesize tbView, stationSelectionList;
 
 
 -(void) viewDidLoad
@@ -132,6 +132,18 @@
         return contentCell;
     }
 
+}
+
+-(void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == StationSection && indexPath.row) 
+    {
+        self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:nil action:nil] autorelease];
+        
+        [self.navigationController pushViewController:self.stationSelectionList animated:YES];
+    }
+    
+    [self.tbView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

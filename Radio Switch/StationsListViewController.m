@@ -7,7 +7,441 @@
 //
 
 #import "StationsListViewController.h"
+#import "CustomCellBackgroundView.h"
+#import "RequestsManager.h"
+#import "HeaderCell.h"
+#import "SmallContentCell.h"
+#import "MoreCell.h"
 
 @implementation StationsListViewController
+@synthesize tbView, viewSelector, categoryListView;
+
+-(void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self.navigationItem setTitle: NSLocalizedString(@"Stations", nil)];
+    
+    selectedSection = -10;
+}
+
+-(void) addNewStation
+{
+    UIActionSheet *actionSheet = [[[UIActionSheet alloc] 
+                                   initWithTitle:NSLocalizedString(@"Please select how to add new station", nil) delegate:self 
+                                   cancelButtonTitle:nil 
+                                   destructiveButtonTitle:NSLocalizedString(@"Cancel", nil) 
+                                   otherButtonTitles: NSLocalizedString(@"Enter URL", nil), 
+                                                        NSLocalizedString(@"Search with browser", nil), nil] autorelease];
+    
+    [actionSheet showFromTabBar: 
+                    ((AppDelegate *) [[UIApplication sharedApplication] 
+                                      delegate]).tabBarController.tabBar];
+}
+
+-(void) viewDidLoad
+{
+    [super viewDidLoad];
+    
+    [self.viewSelector setTitle: NSLocalizedString(@"Categories", nil) 
+              forSegmentAtIndex: 0];
+    
+    [self.viewSelector setTitle: NSLocalizedString(@"List", nil) 
+              forSegmentAtIndex: 1];
+    
+    [self.viewSelector setTitle: NSLocalizedString(@"Custom", nil) 
+              forSegmentAtIndex: 2];
+    
+    [self.viewSelector setTitle: NSLocalizedString(@"Recorded", nil) 
+              forSegmentAtIndex: 3];
+    
+    currentViewType = CategoriesView;
+    
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNewStation)] autorelease];
+}
+
+-(IBAction)viewTypeChanged:(id)sender
+{
+    currentViewType = ((UISegmentedControl *) sender).selectedSegmentIndex;
+    [self.tbView reloadData];
+}
+
+-(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0
+        && currentViewType == ListView)
+    {
+        // Header cell
+        
+        static NSString *cellIdentifier = @"HeaderCell";
+        
+        HeaderCell *headerCell = (HeaderCell *)[tableView dequeueReusableCellWithIdentifier: cellIdentifier];
+        
+        if (headerCell == nil)
+        {
+            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"HeaderCell" owner:self options:nil];
+            
+            id firstObject = [topLevelObjects objectAtIndex: 0];
+            
+            if ([firstObject isKindOfClass: [HeaderCell class]])
+            {
+                headerCell = firstObject;
+            }
+            else 
+            {
+                headerCell = [topLevelObjects objectAtIndex: 1];
+            }
+            
+            [headerCell setBackgroundView: nil];
+            [headerCell setBackgroundColor: [UIColor clearColor]];
+        }
+        
+        if ([[RequestsManager sharedManager].allData count] > indexPath.section
+            && [[RequestsManager sharedManager].allData objectAtIndex: indexPath.section]) 
+        {
+            headerCell.cellTitleLabel.text = [[[RequestsManager sharedManager].allData objectAtIndex: indexPath.section] objectForKey: @"name"];
+        }
+        
+        return headerCell;
+    }
+    else if(((indexPath.section == selectedSection || indexPath.row != 3) 
+             && currentViewType == ListView) 
+            || (currentViewType == CategoriesView 
+                && indexPath.section == selectedSection))
+    {
+        /// Content cells start
+        
+        SmallContentCell *contentCell = nil;
+        
+        NSString *cellToLoad = nil;
+        
+        cellToLoad = @"SmallContentCell";
+        
+        NSString *cellIdentifier = cellToLoad;
+        
+        contentCell = (SmallContentCell *)[tableView dequeueReusableCellWithIdentifier: cellIdentifier];
+        
+        if (contentCell == nil)
+        {
+            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:cellToLoad owner:self options:nil];
+            
+            id firstObject = [topLevelObjects objectAtIndex: 0];
+            
+            if ([firstObject isKindOfClass: [SmallContentCell class]])
+            {
+                contentCell = firstObject;
+            }
+            else 
+            {
+                contentCell = [topLevelObjects objectAtIndex: 1];
+            }
+        }
+        
+        CustomCellBackgroundView *bgView = [[[CustomCellBackgroundView alloc] initWithFrame:contentCell.frame gradientTop:[UIColor colorWithRed:0.3882 green:0.7373 blue:0.9765 alpha:1.0f] andBottomColor:[UIColor colorWithRed:0.3412 green:0.5843 blue:0.8902 alpha:1.0f] andBorderColor:[UIColor lightGrayColor]] autorelease];
+        
+        if (indexPath.row == [self tableView:self.tbView numberOfRowsInSection:indexPath.section] - 1) 
+        {
+            [contentCell.separatorView setHidden: YES];
+            bgView.position = CustomCellBackgroundViewPositionBottom;
+        }
+        else
+        {
+            [contentCell.separatorView setHidden: NO];
+            bgView.position = CustomCellBackgroundViewPositionMiddle;
+        }
+        
+        if ([[RequestsManager sharedManager].allData count] > indexPath.section
+            && [[[[RequestsManager sharedManager].allData objectAtIndex:indexPath.section] objectForKey: @"stations"] count] > indexPath.row) 
+        {
+            NSDictionary *station = [[[[RequestsManager sharedManager].allData 
+                                       objectAtIndex:indexPath.section] objectForKey: @"stations"]
+                                     objectAtIndex: (currentViewType == ListView) ? indexPath.row - 1
+                                                                                    : indexPath.row];
+            
+            contentCell.cellTitleLabel.text = [station objectForKey: @"name"];
+            
+            contentCell.countryLabel.text = NSLocalizedString(@"Unknown country", nil);
+            
+            if ([station objectForKey: @"country"]) 
+            {
+                NSString *country = [[NSLocale currentLocale] 
+                                     displayNameForKey:NSLocaleCountryCode 
+                                     value:[station objectForKey:@"country"]];
+                
+                if (country) 
+                {
+                    contentCell.countryLabel.text = country;
+                }
+                else
+                {
+                    contentCell.countryLabel.text = [station objectForKey: @"country"];
+                }
+            }
+            
+            contentCell.kbpsLabel.text = [station objectForKey: @"bitrate"];
+        }
+        
+        contentCell.selectedBackgroundView = bgView;
+        
+        return contentCell;
+    }
+    else if(currentViewType == ListView)
+    {
+        static NSString *cellIdentifier = @"MoreCell";
+        
+        MoreCell *moreCell = (MoreCell *)[tableView dequeueReusableCellWithIdentifier: cellIdentifier];
+        
+        if (moreCell == nil)
+        {
+            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"MoreCell" owner:self options:nil];
+            
+            id firstObject = [topLevelObjects objectAtIndex: 0];
+            
+            if ([firstObject isKindOfClass: [MoreCell class]])
+            {
+                moreCell = firstObject;
+            }
+            else 
+            {
+                moreCell = [topLevelObjects objectAtIndex: 1];
+            }
+        }
+        
+        CustomCellBackgroundView *bgView = [[[CustomCellBackgroundView alloc] initWithFrame:moreCell.frame gradientTop:[UIColor colorWithRed:0.3882 green:0.7373 blue:0.9765 alpha:1.0f] andBottomColor:[UIColor colorWithRed:0.3412 green:0.5843 blue:0.8902 alpha:1.0f] andBorderColor:[UIColor lightGrayColor]] autorelease];
+        
+        bgView.position = CustomCellBackgroundViewPositionBottom;
+        moreCell.selectedBackgroundView = bgView;
+        
+        moreCell.cellTitleLabel.text = NSLocalizedString(@"More....", nil);
+        
+        return moreCell;
+    }
+    else
+    {
+        return [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
+                                       reuseIdentifier: @"Empty"] autorelease];
+    }
+}
+
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if (currentViewType == ListView
+        || currentViewType == CategoriesView) 
+    {
+        return [[RequestsManager sharedManager].allData count];
+    }
+    
+    return 0;
+}
+
+-(IBAction)categoryButtonPressed:(id)sender
+{
+    int tag = [sender tag];
+    tag %= 900;
+    selectedSection = tag;
+    
+    self.categoryListView.selectedSection = selectedSection;
+    [[((AppDelegate *)[[UIApplication sharedApplication] delegate]) window] 
+                                        addSubview: self.categoryListView.view];
+    
+    [self.categoryListView animateIn];
+}
+
+-(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return nil;
+}
+
+-(UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    
+    if (currentViewType == CategoriesView) 
+    {
+        UIView *headerView = [[[UIView alloc] initWithFrame: CGRectMake(0.0f, 0.0f, self.tbView.frame.size.width, self.tbView.frame.size.height)] autorelease];
+        
+        [headerView setBackgroundColor: [UIColor clearColor]];
+        
+        UIButton *headerButton = [UIButton buttonWithType: UIButtonTypeCustom];
+        [headerButton setFrame: CGRectMake(10.0f, 2.0f + (section == 0 ? 4.0f : 0.0f), 300.0f, 44.0f)]; 
+        
+        [headerButton addTarget:self action:@selector(categoryButtonPressed:) 
+               forControlEvents:UIControlEventTouchUpInside];
+        
+        [headerButton setBackgroundImage:[UIImage imageNamed:@"cat_cell_bg.png"] forState:UIControlStateNormal];
+        headerButton.tag = 900 + section;
+        
+        [headerView addSubview: headerButton];
+        
+        UILabel *headerTitleLabel = [[[UILabel alloc] initWithFrame: CGRectMake(50.0f, 12.0f, 200.0f, 21.0f)] autorelease];
+        
+        [headerTitleLabel setFont: [UIFont fontWithName:@"TimesNewRomanPS-BoldMT" size:18.0f]];
+        [headerTitleLabel setTextColor: [UIColor darkGrayColor]];
+        [headerTitleLabel setBackgroundColor: [UIColor clearColor]];
+        
+        if (section < [[RequestsManager sharedManager].allData count]) 
+        {
+            [headerTitleLabel setText: [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey: @"name"]];
+            
+            [headerButton addSubview: headerTitleLabel];
+        }
+        
+        return headerView;
+    }
+    else
+    {
+        UIView *transparentView = [[[UIView alloc] initWithFrame: 
+                                    CGRectMake(0.0f, 0.0f, self.view.frame.size.width, 
+                                               [self tableView: self.tbView heightForHeaderInSection:section])] autorelease];
+        
+        [transparentView setBackgroundColor: [UIColor clearColor]];
+        
+        return transparentView;
+    }
+}
+
+-(NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (currentViewType == ListView) 
+    {
+        if (section == selectedSection) 
+        {
+            if ([[RequestsManager sharedManager].allData count] > section 
+                && [[RequestsManager sharedManager].allData objectAtIndex: section]) 
+            {
+                NSArray *stations = [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey:@"stations"];
+                
+                return [stations count] + 1;
+            }
+            
+            return 0;
+        }
+        else
+        {
+            int minCount = 4;
+            
+            if ([[RequestsManager sharedManager].allData count] > section 
+                && [[RequestsManager sharedManager].allData objectAtIndex: section]) 
+            {
+                
+                NSArray *stations = [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey:@"stations"];
+                
+                minCount = [stations count] + 2;
+                
+            }
+            
+            return MIN(4, minCount);
+        }
+    }
+    else if(currentViewType == CategoriesView)
+    {
+        return 0;
+    }
+    
+    return 0;
+}
+
+-(CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (currentViewType == ListView) 
+    {
+        if (indexPath.row == 0 || 
+            (indexPath.row == [self tableView:self.tbView numberOfRowsInSection: indexPath.section] - 1
+             && indexPath.section != selectedSection && indexPath.row == 3)) 
+        {
+            return 32.0f;
+        }
+        else
+        {
+            return 55.0f;
+        }
+    }
+    else if(currentViewType == CategoriesView)
+    {
+        return 55.0f;
+    }
+    
+    return 44.0f;
+}
+
+-(void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [self.tbView deselectRowAtIndexPath:indexPath animated: YES];
+    
+    if (currentViewType == ListView) 
+    {
+        if (indexPath.row == 3 && indexPath.section != selectedSection) 
+        {
+            selectedSection = -10;
+            
+            [self.tbView reloadData];
+            
+            selectedSection = indexPath.section;
+            
+            NSMutableArray *paths = [NSMutableArray array];
+            
+            for (int i = indexPath.row; i < 
+                 [self tableView:self.tbView 
+           numberOfRowsInSection: indexPath.section] - 1; i++)
+            {
+                [paths addObject: [NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+            }
+            
+            if ([paths count]) 
+            {
+                [self.tbView beginUpdates];
+                
+                [self.tbView insertRowsAtIndexPaths:paths withRowAnimation: UITableViewRowAnimationFade];
+                
+                [self.tbView endUpdates];
+                
+                [self.tbView performSelector:
+                 @selector(reloadData) 
+                                  withObject:nil afterDelay:0.5f];
+            }
+            else
+            {
+                [self.tbView reloadData];
+            }
+        }
+    }
+}
+
+-(CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    if (currentViewType == ListView) 
+    {
+        if (section != [[RequestsManager sharedManager].allData count]) 
+        {
+            return 3.0f;
+        }
+    }
+    else if(currentViewType == CategoriesView)
+    {
+        return 1.0f;
+    }
+    
+    return 10.0f;
+}
+
+-(CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (currentViewType == ListView) 
+    {
+        if (section) 
+        {
+            return 5.0f;
+        }
+    }
+    else if(currentViewType == CategoriesView)
+    {
+        if (!section) 
+        {
+            return 52.0f;
+        }
+        return 48.0f;
+    }
+    
+    return 10.0f;
+}
 
 @end
