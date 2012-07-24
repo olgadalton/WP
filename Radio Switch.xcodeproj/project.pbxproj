@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8407317D15BE9624007E6916 /* PreferencesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407317C15BE9624007E6916 /* PreferencesManager.m */; };
+		8407318415BE9D34007E6916 /* inputBg.png in Resources */ = {isa = PBXBuildFile; fileRef = 8407318215BE9D34007E6916 /* inputBg.png */; };
+		8407318515BE9D34007E6916 /* inputBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8407318315BE9D34007E6916 /* inputBg@2x.png */; };
+		8407318E15BEA476007E6916 /* FixedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407318D15BEA476007E6916 /* FixedTextField.m */; };
+		8407319215BEB311007E6916 /* grayBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 8407319015BEB311007E6916 /* grayBtn.png */; };
+		8407319315BEB311007E6916 /* grayBtn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8407319115BEB311007E6916 /* grayBtn@2x.png */; };
 		842096D915A4C7F600FB3E62 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842096D815A4C7F600FB3E62 /* UIKit.framework */; };
 		842096DB15A4C7F600FB3E62 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842096DA15A4C7F600FB3E62 /* Foundation.framework */; };
 		842096DD15A4C7F600FB3E62 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842096DC15A4C7F600FB3E62 /* CoreGraphics.framework */; };
@@ -88,6 +94,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8407317B15BE9624007E6916 /* PreferencesManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesManager.h; sourceTree = "<group>"; };
+		8407317C15BE9624007E6916 /* PreferencesManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesManager.m; sourceTree = "<group>"; };
+		8407318215BE9D34007E6916 /* inputBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inputBg.png; sourceTree = "<group>"; };
+		8407318315BE9D34007E6916 /* inputBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "inputBg@2x.png"; sourceTree = "<group>"; };
+		8407318C15BEA476007E6916 /* FixedTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixedTextField.h; sourceTree = "<group>"; };
+		8407318D15BEA476007E6916 /* FixedTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FixedTextField.m; sourceTree = "<group>"; };
+		8407319015BEB311007E6916 /* grayBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grayBtn.png; sourceTree = "<group>"; };
+		8407319115BEB311007E6916 /* grayBtn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "grayBtn@2x.png"; sourceTree = "<group>"; };
 		842096D415A4C7F600FB3E62 /* Wish Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wish Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		842096D815A4C7F600FB3E62 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		842096DA15A4C7F600FB3E62 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -214,6 +228,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8407317915BE95ED007E6916 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				8407317B15BE9624007E6916 /* PreferencesManager.h */,
+				8407317C15BE9624007E6916 /* PreferencesManager.m */,
+			);
+			name = Preferences;
+			sourceTree = "<group>";
+		};
+		8407318B15BEA454007E6916 /* FixedTextField */ = {
+			isa = PBXGroup;
+			children = (
+				8407318C15BEA476007E6916 /* FixedTextField.h */,
+				8407318D15BEA476007E6916 /* FixedTextField.m */,
+			);
+			name = FixedTextField;
+			sourceTree = "<group>";
+		};
 		842096C915A4C7F600FB3E62 = {
 			isa = PBXGroup;
 			children = (
@@ -250,6 +282,7 @@
 		842096DE15A4C7F600FB3E62 /* Radio Switch */ = {
 			isa = PBXGroup;
 			children = (
+				8407317915BE95ED007E6916 /* Preferences */,
 				84F5530615A61E7C00C765AD /* objc utils */,
 				8420975915A4E7B000FB3E62 /* requests */,
 				8420972515A4E1BA00FB3E62 /* images */,
@@ -339,6 +372,10 @@
 		8420972515A4E1BA00FB3E62 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				8407319015BEB311007E6916 /* grayBtn.png */,
+				8407319115BEB311007E6916 /* grayBtn@2x.png */,
+				8407318215BE9D34007E6916 /* inputBg.png */,
+				8407318315BE9D34007E6916 /* inputBg@2x.png */,
 				84EFDD0015BDCCB8007C2403 /* paperedge-bottom-shadow.png */,
 				84EFDD0115BDCCB8007C2403 /* paperedge-bottom-shadow@2x.png */,
 				84EFDD0215BDCCB8007C2403 /* paperedge-bottom.png */,
@@ -386,6 +423,7 @@
 		8420975315A4E76300FB3E62 /* StationsList */ = {
 			isa = PBXGroup;
 			children = (
+				8407318B15BEA454007E6916 /* FixedTextField */,
 				84EFDCEE15BDCBC8007C2403 /* CategoryListPopup.h */,
 				84EFDCEF15BDCBC9007C2403 /* CategoryListPopup.m */,
 				84EFDCF015BDCBC9007C2403 /* CategoryListPopup.xib */,
@@ -562,6 +600,10 @@
 				84EFDD0D15BDCCB8007C2403 /* paperedge-top-shadow@2x.png in Resources */,
 				84EFDD0E15BDCCB8007C2403 /* paperedge-top.png in Resources */,
 				84EFDD0F15BDCCB8007C2403 /* paperedge-top@2x.png in Resources */,
+				8407318415BE9D34007E6916 /* inputBg.png in Resources */,
+				8407318515BE9D34007E6916 /* inputBg@2x.png in Resources */,
+				8407319215BEB311007E6916 /* grayBtn.png in Resources */,
+				8407319315BEB311007E6916 /* grayBtn@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -588,6 +630,8 @@
 				84F795AE15B9A2F200D10316 /* SmallContentCell.m in Sources */,
 				84F795B415B9A97300D10316 /* MoreCell.m in Sources */,
 				84EFDCF115BDCBC9007C2403 /* CategoryListPopup.m in Sources */,
+				8407317D15BE9624007E6916 /* PreferencesManager.m in Sources */,
+				8407318E15BEA476007E6916 /* FixedTextField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

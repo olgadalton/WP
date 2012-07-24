@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CategoryListPopup.h"
+#import "FixedTextField.h"
 
 enum ViewType {
     CategoriesView = 0,
@@ -28,6 +29,21 @@ enum ViewType {
     enum ViewType currentViewType;
     
     IBOutlet CategoryListPopup *categoryListView;
+    
+    IBOutlet UIView *pickerMainView;
+    IBOutlet UINavigationBar *pickerNavbar;
+    IBOutlet UINavigationItem *pickerNavItem;
+    
+    BOOL pickerVisible;
+    
+    IBOutlet FixedTextField *stationNameField;
+    IBOutlet FixedTextField *stationURLField;
+    
+    FixedTextField *currentTextField;
+    
+    BOOL editingInProcess;
+    
+    IBOutlet UIButton *addStationButton;
 }
 
 @property (nonatomic, retain) IBOutlet UITableView *tbView;
@@ -36,9 +52,25 @@ enum ViewType {
 
 @property (nonatomic, retain) IBOutlet CategoryListPopup *categoryListView;
 
+@property (nonatomic, retain) IBOutlet UIView *pickerMainView;
+@property (nonatomic, retain) IBOutlet UINavigationBar *pickerNavbar;
+@property (nonatomic, retain) IBOutlet UINavigationItem *pickerNavItem;
+
+@property (nonatomic, retain) IBOutlet FixedTextField *stationNameField;
+@property (nonatomic, retain) IBOutlet FixedTextField *stationURLField;
+@property (nonatomic, retain) FixedTextField *currentTextField;
+
+@property (nonatomic, retain) IBOutlet UIButton *addStationButton;
+
 -(IBAction)viewTypeChanged:(id)sender;
 -(IBAction)categoryButtonPressed:(id)sender;
 
--(void) addNewStation;
+-(IBAction) addNewStation: (id) selector;
+
+-(void) showBottomPopup;
+-(void)dismissPicker;
+
+-(IBAction)dismissKeyboard:(id)sender;
+-(IBAction)editingDidStart:(id)sender;
 
 @end

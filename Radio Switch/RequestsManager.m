@@ -196,6 +196,8 @@ static RequestsManager *sharedRequestsManager = nil;
     }
     
     self.allData = withStations;
+    
+    NSLog(@"all stations - %@", self.allData);
 }
 
 -(void) listDataFailedWithError: (NSString *) errorDescription

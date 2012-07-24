@@ -12,9 +12,13 @@
 #import "HeaderCell.h"
 #import "SmallContentCell.h"
 #import "MoreCell.h"
+#import "PreferencesManager.h"
 
 @implementation StationsListViewController
 @synthesize tbView, viewSelector, categoryListView;
+@synthesize pickerNavbar, pickerNavItem, pickerMainView;
+@synthesize stationNameField, stationURLField, currentTextField;
+@synthesize addStationButton;
 
 -(void) viewWillAppear:(BOOL)animated
 {
@@ -25,24 +29,170 @@
     selectedSection = -10;
 }
 
--(void) addNewStation
+-(IBAction) addNewStation: (id) selector
 {
-    UIActionSheet *actionSheet = [[[UIActionSheet alloc] 
-                                   initWithTitle:NSLocalizedString(@"Please select how to add new station", nil) delegate:self 
-                                   cancelButtonTitle:nil 
-                                   destructiveButtonTitle:NSLocalizedString(@"Cancel", nil) 
-                                   otherButtonTitles: NSLocalizedString(@"Enter URL", nil), 
-                                                        NSLocalizedString(@"Search with browser", nil), nil] autorelease];
+    if (!pickerVisible) 
+    {
+        UIActionSheet *actionSheet = [[[UIActionSheet alloc] 
+                                       initWithTitle:NSLocalizedString(@"Please select how to add new station", nil) delegate:self 
+                                       cancelButtonTitle:nil 
+                                       destructiveButtonTitle:NSLocalizedString(@"Cancel", nil) 
+                                       otherButtonTitles: NSLocalizedString(@"Enter URL", nil), 
+                                       NSLocalizedString(@"Search with browser", nil), nil] autorelease];
+        
+        [actionSheet showFromTabBar: 
+         ((AppDelegate *) [[UIApplication sharedApplication] 
+                           delegate]).tabBarController.tabBar];
+    }
+}
+
+-(void) showBottomPopup
+{
+    [self.pickerNavbar setTintColor: [UIColor blackColor]];
+    [self.pickerNavItem setTitle: NSLocalizedString(@"Add new station", nil)];
     
-    [actionSheet showFromTabBar: 
-                    ((AppDelegate *) [[UIApplication sharedApplication] 
-                                      delegate]).tabBarController.tabBar];
+    self.pickerNavItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle: NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(dismissPicker)] autorelease];
+    
+    self.pickerNavItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Add", nil) style:UIBarButtonItemStyleDone target:self action:@selector(saveAndDismiss)] autorelease];
+    
+    pickerVisible = YES;
+    
+    [self.pickerMainView removeFromSuperview];
+    
+    CGRect datePickerFrame = self.pickerMainView.frame;
+    
+    [self.pickerMainView setFrame: CGRectMake(0.0, self.view.frame.size.height, datePickerFrame.size.width, datePickerFrame.size.height)];
+    
+    [self.view addSubview: self.pickerMainView];
+    
+    [UIView beginAnimations:@"" context: NULL];
+    [UIView setAnimationDuration: 0.3f];
+    [UIView setAnimationCurve: UIViewAnimationCurveEaseIn];
+    
+    [self.pickerMainView setFrame: CGRectMake(0.0, self.view.frame.size.height - datePickerFrame.size.height, datePickerFrame.size.width, datePickerFrame.size.height)];
+    
+    [UIView commitAnimations];          
+}
+
+-(void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) 
+    {
+        [self showBottomPopup];
+    }
+}
+                                              
+-(void) saveAndDismiss
+{
+    if (self.stationURLField.text.length && self.stationNameField.text.length) 
+    {
+        [[PreferencesManager sharedManager] addStation: [NSDictionary dictionaryWithObjectsAndKeys:self.stationNameField.text, @"name", self.stationURLField.text, @"streamurl", nil]];
+        
+        [self dismissPicker];
+    }
+    else
+    {
+        UIAlertView *errorAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Please fill in all fields!", nil) message:nil delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil] autorelease];
+        
+        [errorAlert show];
+    }
+}
+   
+-(IBAction)dismissKeyboard:(id)sender
+{
+    
+    if ([sender isFirstResponder]) 
+    {
+        [sender resignFirstResponder];
+        
+        editingInProcess = NO;
+        
+        [self performSelector:@selector(scrollMeUp) withObject: nil afterDelay:0.0f];
+    }
+}
+
+-(void) scrollMeUp
+{
+    if (!editingInProcess && pickerVisible) 
+    {
+        CGRect datePickerFrame = self.pickerMainView.frame;
+        [UIView beginAnimations:@"" context: NULL];
+        [UIView setAnimationDuration: 0.15f];
+        [UIView setAnimationCurve: UIViewAnimationCurveEaseIn];
+        
+        [self.pickerMainView setFrame: CGRectMake(0.0, self.view.frame.size.height - datePickerFrame.size.height, datePickerFrame.size.width, datePickerFrame.size.height)];
+        
+        [UIView commitAnimations]; 
+    }
+}
+
+-(IBAction)editingDidStart:(id)sender
+{
+    if (pickerVisible == NO) 
+    {
+        return;
+    }
+    
+    self.currentTextField = sender;
+    
+    CGRect datePickerFrame = self.pickerMainView.frame;
+    
+    if (!editingInProcess) 
+    {
+        [UIView beginAnimations:@"" context: NULL];
+        [UIView setAnimationDuration: 0.3f];
+        [UIView setAnimationCurve: UIViewAnimationCurveEaseIn];
+        
+        [self.pickerMainView setFrame: CGRectMake(0.0, 0.0f, datePickerFrame.size.width, datePickerFrame.size.height)];
+        
+        [UIView commitAnimations];
+        
+        editingInProcess = YES;
+    }
+}
+
+-(void)dismissPicker
+{
+    if (pickerVisible == NO) 
+    {
+        return;
+    }
+    
+    CGRect datePickerFrame = self.pickerMainView.frame;
+    [UIView beginAnimations:@"" context: NULL];
+    [UIView setAnimationDuration: 0.3f];
+    [UIView setAnimationCurve: UIViewAnimationCurveEaseIn];
+    
+    [self.pickerMainView setFrame: CGRectMake(0.0, self.view.frame.size.height, datePickerFrame.size.width, datePickerFrame.size.height)];
+    
+    [UIView commitAnimations];
+    
+    pickerVisible = NO;
+    
+    [self.tbView reloadData];
+    
+    if (currentViewType == CustomView) 
+    {
+        if ([[PreferencesManager sharedManager].userAddedStations count] == 0) 
+        {
+            [self.addStationButton setHidden: NO];
+        }
+        else
+        {
+            [self.addStationButton setHidden: YES];
+        }
+    }
+    
+    if (self.currentTextField && [self.currentTextField isFirstResponder]) 
+    {
+        [self.currentTextField resignFirstResponder];
+    }
 }
 
 -(void) viewDidLoad
 {
     [super viewDidLoad];
-    
+     
     [self.viewSelector setTitle: NSLocalizedString(@"Categories", nil) 
               forSegmentAtIndex: 0];
     
@@ -57,13 +207,53 @@
     
     currentViewType = CategoriesView;
     
-    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNewStation)] autorelease];
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNewStation:)] autorelease];
+    
+    [self.addStationButton setTitle:NSLocalizedString(@"Add new station", nil) forState:UIControlStateNormal];
+    
+    [self.addStationButton setHidden: YES];
 }
 
 -(IBAction)viewTypeChanged:(id)sender
 {
     currentViewType = ((UISegmentedControl *) sender).selectedSegmentIndex;
     [self.tbView reloadData];
+    
+    [self.addStationButton setHidden: YES];
+    
+    if (currentViewType == CustomView) 
+    {
+        if ([[PreferencesManager sharedManager].userAddedStations count] == 0) 
+        {
+            [self.addStationButton setHidden: NO];
+        }
+    }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) 
+    {
+        [[PreferencesManager sharedManager] removeStationAtIndex: indexPath.row];
+        [self.tbView reloadData];
+        
+        if (currentViewType == CustomView) 
+        {
+            if ([[PreferencesManager sharedManager].userAddedStations count] == 0) 
+            {
+                [self.addStationButton setHidden: NO];
+            }
+        }
+        else
+        {
+            [self.addStationButton setHidden: YES];
+        }
+    }    
 }
 
 -(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -216,6 +406,65 @@
         
         return moreCell;
     }
+    else if(currentViewType == CustomView)
+    {
+        static NSString *cellIdentifier = @"SmallContentCell";
+        
+        SmallContentCell *stationCell = (SmallContentCell *)[tableView dequeueReusableCellWithIdentifier: cellIdentifier];
+        
+        if (stationCell == nil)
+        {
+            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"SmallContentCell" owner:self options:nil];
+            
+            id firstObject = [topLevelObjects objectAtIndex: 0];
+            
+            if ([firstObject isKindOfClass: [SmallContentCell class]])
+            {
+                stationCell = firstObject;
+            }
+            else 
+            {
+                stationCell = [topLevelObjects objectAtIndex: 1];
+            }
+        }
+        
+        CustomCellBackgroundView *bgView = [[[CustomCellBackgroundView alloc] initWithFrame:stationCell.frame gradientTop:[UIColor colorWithRed:0.3882 green:0.7373 blue:0.9765 alpha:1.0f] andBottomColor:[UIColor colorWithRed:0.3412 green:0.5843 blue:0.8902 alpha:1.0f] andBorderColor:[UIColor lightGrayColor]] autorelease];
+        
+        stationCell.selectedBackgroundView = bgView;
+        
+        [stationCell.separatorView setHidden: NO];
+        
+        if ([[PreferencesManager sharedManager].userAddedStations count] == 1) 
+        {
+            bgView.position = CustomCellBackgroundViewPositionSingle;
+            [stationCell.separatorView setHidden: YES];
+        }
+        else if(indexPath.row == 0)
+        {
+            bgView.position = CustomCellBackgroundViewPositionTop;
+        }
+        else if(indexPath.row == [[PreferencesManager sharedManager].userAddedStations count] - 1)
+        {
+            bgView.position = CustomCellBackgroundViewPositionBottom;
+            [stationCell.separatorView setHidden: YES];
+        }
+        else
+        {
+            bgView.position = CustomCellBackgroundViewPositionMiddle;
+        }
+        
+        stationCell.cellTitleLabel.text = [[[PreferencesManager sharedManager].userAddedStations 
+                                                                    objectAtIndex:indexPath.row] 
+                                                                    objectForKey: @"name"];
+        
+        stationCell.countryLabel.text = [[[PreferencesManager sharedManager].userAddedStations 
+                                          objectAtIndex:indexPath.row] 
+                                         objectForKey: @"streamurl"];
+        
+        stationCell.kbpsLabel.text = nil;
+        
+        return stationCell;
+    }
     else
     {
         return [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
@@ -229,6 +478,10 @@
         || currentViewType == CategoriesView) 
     {
         return [[RequestsManager sharedManager].allData count];
+    }
+    else if(currentViewType == CustomView)
+    {
+        return 1;
     }
     
     return 0;
@@ -336,6 +589,10 @@
     {
         return 0;
     }
+    else if(currentViewType == CustomView)
+    {
+        return [[PreferencesManager sharedManager].userAddedStations count];
+    }
     
     return 0;
 }
@@ -355,7 +612,8 @@
             return 55.0f;
         }
     }
-    else if(currentViewType == CategoriesView)
+    else if(currentViewType == CategoriesView 
+            || currentViewType == CustomView)
     {
         return 55.0f;
     }
