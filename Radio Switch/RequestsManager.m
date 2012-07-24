@@ -11,7 +11,7 @@
 #import "JSONKit.h"
 
 @implementation RequestsManager
-@synthesize handler, tempDataHolder, allData;
+@synthesize handler, tempDataHolder, allData, waitAlert;
 
 static RequestsManager *sharedRequestsManager = nil;
 
@@ -47,6 +47,56 @@ static RequestsManager *sharedRequestsManager = nil;
     return self;
 }
 
+-(void) urlIsCorrect: (NSString *) url andResultSelector: (SEL) resultSelector andDelegate: (id) delegate
+{
+    self.waitAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Checking URL...\nPlease wait!", nil) message:nil delegate:self cancelButtonTitle:nil otherButtonTitles: nil] autorelease];
+    
+    UIActivityIndicatorView *spinner = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
+    
+    [spinner setFrame: CGRectMake(124.0f, 73.0f, spinner.frame.size.width, spinner.frame.size.height)];
+    
+    [self.waitAlert addSubview: spinner];
+    [spinner startAnimating];
+    
+    [self.waitAlert show];
+    
+    NSDictionary *dataDictionary = [NSDictionary dictionaryWithObjectsAndKeys: url, @"url",         NSStringFromSelector(resultSelector), @"selector", delegate, @"delegate", nil];
+    
+    [self performSelector:@selector(performURLCheck:)
+                            withObject: dataDictionary
+                            afterDelay: 0.5f];
+}
+
+-(void) performURLCheck: (NSDictionary *) data
+{
+    NSURL *myURL = [NSURL URLWithString: [data objectForKey: @"url"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: myURL];
+    [request setHTTPMethod: @"HEAD"];
+    NSURLResponse *response;
+    NSError *error;
+    NSData *myData = [NSURLConnection sendSynchronousRequest: request returningResponse: &response error: &error];
+    BOOL reachable;
+    
+    if (myData) {
+        // we are probably reachable, check the response
+        reachable = YES;
+    } else {
+        // we are probably not reachable, check the error:
+        reachable = NO;
+    }
+    
+    [self.waitAlert dismissWithClickedButtonIndex:-10 animated:YES];
+    
+    SEL resultSelector = NSSelectorFromString([data objectForKey: @"selector"]);
+    
+    id delegate = [data objectForKey: @"delegate"];
+    
+    if ([delegate respondsToSelector: resultSelector]) 
+    {
+        [delegate performSelector: resultSelector withObject: [NSNumber numberWithBool: reachable]];
+    }
+}
+
 -(void) loadRadiosListAndSave
 {
     [self loadStationsDataFromCache];
@@ -67,14 +117,14 @@ static RequestsManager *sharedRequestsManager = nil;
                              andHTTPMethod:@"GET" 
                             andContentType:@"application/json" andAuthorization:nil];
     }
-//    else 
-//    {
-//        [self loadStationsDataFromCache];
-//    }
+    //    else 
+    //    {
+    //        [self loadStationsDataFromCache];
+    //    }
 }
 
 -(void) firstListLoadedWithData: (NSString *) data 
-                            andInfo: (NSDictionary *) info
+                        andInfo: (NSDictionary *) info
 {
     if([info objectForKey:@"stID"] == nil)
     {
@@ -85,7 +135,7 @@ static RequestsManager *sharedRequestsManager = nil;
         if (jsonData) 
         {
             self.tempDataHolder = [NSMutableArray arrayWithArray: jsonData];
-
+            
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey: @"databaseLoaded"];
             [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"lastLoaded"];
             [[NSUserDefaults standardUserDefaults] synchronize];
@@ -133,7 +183,7 @@ static RequestsManager *sharedRequestsManager = nil;
                 [newDict setObject:stationsList forKey: @"stations"];
                 
                 [self.tempDataHolder replaceObjectAtIndex: 
-                                    [self.tempDataHolder indexOfObject: toReplace] 
+                 [self.tempDataHolder indexOfObject: toReplace] 
                                                withObject: newDict];
             }
         }

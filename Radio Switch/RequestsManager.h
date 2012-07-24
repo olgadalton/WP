@@ -22,11 +22,14 @@
     int inQue;
     
     NSMutableArray *allData;
+    
+    UIAlertView *waitAlert;
 }
 
 @property (nonatomic, retain) RequestsHandler *handler;
 @property (nonatomic, retain) NSMutableArray *tempDataHolder;
 @property (nonatomic, retain) NSMutableArray *allData;
+@property (nonatomic, retain) UIAlertView *waitAlert;
 
 -(void) loadRadiosListAndSave;
 
@@ -38,5 +41,8 @@
 -(void) listDataFailedWithError: (NSString *) errorDescription;
 
 -(void) loadStationsDataFromCache;
+
+-(void) urlIsCorrect: (NSString *) url andResultSelector: (SEL) resultSelector andDelegate: (id) delegate;
+-(void) performURLCheck: (NSDictionary *) data;
 
 @end

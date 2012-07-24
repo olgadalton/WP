@@ -81,14 +81,34 @@
         [self showBottomPopup];
     }
 }
+
+-(void) urlCheckDone: (NSNumber *) result
+{
+    BOOL isCorrect = [result boolValue];
+    
+    if (isCorrect  == YES)
+    {
+        [[PreferencesManager sharedManager] addStation: [NSDictionary dictionaryWithObjectsAndKeys:self.stationNameField.text, @"name", self.stationURLField.text, @"streamurl", nil]];
+        
+        [self dismissPicker];
+    }
+    else 
+    {
+        UIAlertView *errorAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The url you entered is not correct!", nil) message:nil delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil] autorelease];
+        
+        [errorAlert show];
+    }
+}
                                               
 -(void) saveAndDismiss
 {
     if (self.stationURLField.text.length && self.stationNameField.text.length) 
     {
-        [[PreferencesManager sharedManager] addStation: [NSDictionary dictionaryWithObjectsAndKeys:self.stationNameField.text, @"name", self.stationURLField.text, @"streamurl", nil]];
+        // Validate url
         
-        [self dismissPicker];
+        NSString *enteredUrl = self.stationURLField.text;
+        
+        [[RequestsManager sharedManager] urlIsCorrect:enteredUrl andResultSelector:@selector(urlCheckDone:) andDelegate:self];
     }
     else
     {

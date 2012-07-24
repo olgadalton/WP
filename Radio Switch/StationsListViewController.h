@@ -73,4 +73,6 @@ enum ViewType {
 -(IBAction)dismissKeyboard:(id)sender;
 -(IBAction)editingDidStart:(id)sender;
 
+-(void) urlCheckDone: (NSNumber *) result;
+
 @end
