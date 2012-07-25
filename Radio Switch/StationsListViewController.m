@@ -18,7 +18,7 @@
 @synthesize tbView, viewSelector, categoryListView;
 @synthesize pickerNavbar, pickerNavItem, pickerMainView;
 @synthesize stationNameField, stationURLField, currentTextField;
-@synthesize addStationButton;
+@synthesize addStationButton, analyzingBrowser, searchBar;
 
 -(void) viewWillAppear:(BOOL)animated
 {
@@ -27,6 +27,10 @@
     [self.navigationItem setTitle: NSLocalizedString(@"Stations", nil)];
     
     selectedSection = -10;
+    
+    [self.tbView reloadData];
+    
+    [self.tbView setContentOffset:CGPointMake(0,40)];
 }
 
 -(IBAction) addNewStation: (id) selector
@@ -80,6 +84,40 @@
     {
         [self showBottomPopup];
     }
+    else if(buttonIndex == 2)
+    {
+        self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:nil action:nil] autorelease];
+        
+        [self.navigationController pushViewController:self.analyzingBrowser animated:YES];
+    }
+}
+
+-(void) searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    searching = YES;
+    [self.tbView reloadData];
+}
+
+-(void) searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+    if ([self.searchBar isFirstResponder]) 
+    {
+        [self.searchBar resignFirstResponder];
+    }
+    
+    searching = NO;
+    [self.tbView reloadData];
+}
+
+-(void) searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    if ([self.searchBar isFirstResponder]) 
+    {
+        [self.searchBar resignFirstResponder];
+    }
+    
+    searching = YES;
+    [self.tbView reloadData];
 }
 
 -(void) urlCheckDone: (NSNumber *) result
@@ -236,6 +274,7 @@
 
 -(IBAction)viewTypeChanged:(id)sender
 {
+    searching = NO;
     currentViewType = ((UISegmentedControl *) sender).selectedSegmentIndex;
     [self.tbView reloadData];
     
@@ -252,7 +291,14 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath 
 {
-    return YES;
+    if (!searching && currentViewType == CustomView) 
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -279,7 +325,7 @@
 -(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.row == 0
-        && currentViewType == ListView)
+        && currentViewType == ListView && !searching)
     {
         // Header cell
         
@@ -314,10 +360,10 @@
         
         return headerCell;
     }
-    else if(((indexPath.section == selectedSection || indexPath.row != 3) 
+    else if((((indexPath.section == selectedSection || indexPath.row != 3) 
              && currentViewType == ListView) 
             || (currentViewType == CategoriesView 
-                && indexPath.section == selectedSection))
+                && indexPath.section == selectedSection)) && !searching)
     {
         /// Content cells start
         
@@ -395,7 +441,7 @@
         
         return contentCell;
     }
-    else if(currentViewType == ListView)
+    else if(currentViewType == ListView && !searching)
     {
         static NSString *cellIdentifier = @"MoreCell";
         
@@ -426,7 +472,7 @@
         
         return moreCell;
     }
-    else if(currentViewType == CustomView)
+    else if(currentViewType == CustomView || searching)
     {
         static NSString *cellIdentifier = @"SmallContentCell";
         
@@ -454,32 +500,75 @@
         
         [stationCell.separatorView setHidden: NO];
         
-        if ([[PreferencesManager sharedManager].userAddedStations count] == 1) 
+        if (!searching) 
         {
-            bgView.position = CustomCellBackgroundViewPositionSingle;
-            [stationCell.separatorView setHidden: YES];
-        }
-        else if(indexPath.row == 0)
-        {
-            bgView.position = CustomCellBackgroundViewPositionTop;
-        }
-        else if(indexPath.row == [[PreferencesManager sharedManager].userAddedStations count] - 1)
-        {
-            bgView.position = CustomCellBackgroundViewPositionBottom;
-            [stationCell.separatorView setHidden: YES];
+            stationCell.cellTitleLabel.text = [[[PreferencesManager sharedManager].userAddedStations 
+                                                objectAtIndex:indexPath.row] 
+                                               objectForKey: @"name"];
+            
+            stationCell.countryLabel.text = [[[PreferencesManager sharedManager].userAddedStations 
+                                              objectAtIndex:indexPath.row] 
+                                             objectForKey: @"streamurl"];
+            
+            if ([[PreferencesManager sharedManager].userAddedStations count] == 1) 
+            {
+                bgView.position = CustomCellBackgroundViewPositionSingle;
+                [stationCell.separatorView setHidden: YES];
+            }
+            else if(indexPath.row == 0)
+            {
+                bgView.position = CustomCellBackgroundViewPositionTop;
+            }
+            else if(indexPath.row == [[PreferencesManager sharedManager].userAddedStations count] - 1)
+            {
+                bgView.position = CustomCellBackgroundViewPositionBottom;
+                [stationCell.separatorView setHidden: YES];
+            }
+            else
+            {
+                bgView.position = CustomCellBackgroundViewPositionMiddle;
+            }
         }
         else
         {
-            bgView.position = CustomCellBackgroundViewPositionMiddle;
+            NSArray *searchResults = nil;
+            
+            if (currentViewType == CustomView) 
+            {
+                searchResults = [[RequestsManager sharedManager] searchForTermInUserStations: self.searchBar.text];
+            }
+            else
+            {
+                searchResults = [[RequestsManager sharedManager] searchResultsForTerm: self.searchBar.text];
+            }
+            
+            stationCell.cellTitleLabel.text = [[searchResults 
+                                                objectAtIndex:indexPath.row] 
+                                               objectForKey: @"name"];
+            
+            stationCell.countryLabel.text = [[searchResults 
+                                              objectAtIndex:indexPath.row] 
+                                             objectForKey: @"streamurl"];
+            
+            if ([searchResults count] == 1) 
+            {
+                bgView.position = CustomCellBackgroundViewPositionSingle;
+                [stationCell.separatorView setHidden: YES];
+            }
+            else if(indexPath.row == 0)
+            {
+                bgView.position = CustomCellBackgroundViewPositionTop;
+            }
+            else if(indexPath.row == [searchResults count] - 1)
+            {
+                bgView.position = CustomCellBackgroundViewPositionBottom;
+                [stationCell.separatorView setHidden: YES];
+            }
+            else
+            {
+                bgView.position = CustomCellBackgroundViewPositionMiddle;
+            }
         }
-        
-        stationCell.cellTitleLabel.text = [[[PreferencesManager sharedManager].userAddedStations 
-                                                                    objectAtIndex:indexPath.row] 
-                                                                    objectForKey: @"name"];
-        
-        stationCell.countryLabel.text = [[[PreferencesManager sharedManager].userAddedStations 
-                                          objectAtIndex:indexPath.row] 
-                                         objectForKey: @"streamurl"];
         
         stationCell.kbpsLabel.text = nil;
         
@@ -494,14 +583,21 @@
 
 -(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
-    if (currentViewType == ListView
-        || currentViewType == CategoriesView) 
-    {
-        return [[RequestsManager sharedManager].allData count];
-    }
-    else if(currentViewType == CustomView)
+    if (searching) 
     {
         return 1;
+    }
+    else
+    {
+        if (currentViewType == ListView
+            || currentViewType == CategoriesView) 
+        {
+            return [[RequestsManager sharedManager].allData count];
+        }
+        else if(currentViewType == CustomView)
+        {
+            return 1;
+        } 
     }
     
     return 0;
@@ -528,7 +624,7 @@
 -(UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     
-    if (currentViewType == CategoriesView) 
+    if (currentViewType == CategoriesView && !searching) 
     {
         UIView *headerView = [[[UIView alloc] initWithFrame: CGRectMake(0.0f, 0.0f, self.tbView.frame.size.width, self.tbView.frame.size.height)] autorelease];
         
@@ -581,9 +677,18 @@
             if ([[RequestsManager sharedManager].allData count] > section 
                 && [[RequestsManager sharedManager].allData objectAtIndex: section]) 
             {
-                NSArray *stations = [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey:@"stations"];
-                
-                return [stations count] + 1;
+                if (searching) 
+                {
+                    NSArray *searchResults = [[RequestsManager sharedManager] searchResultsForTerm: self.searchBar.text];
+                    
+                    return [searchResults count];
+                }
+                else
+                {
+                    NSArray *stations = [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey:@"stations"];
+                    
+                    return [stations count] + 1;
+                }
             }
             
             return 0;
@@ -596,22 +701,48 @@
                 && [[RequestsManager sharedManager].allData objectAtIndex: section]) 
             {
                 
-                NSArray *stations = [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey:@"stations"];
-                
-                minCount = [stations count] + 2;
+                if (searching) 
+                {
+                    NSArray *searchResults = [[RequestsManager sharedManager] searchResultsForTerm: self.searchBar.text];
+                    
+                    return [searchResults count];
+                }
+                else
+                {
+                    NSArray *stations = [[[RequestsManager sharedManager].allData objectAtIndex: section] objectForKey:@"stations"];
+                    
+                    minCount = [stations count] + 2;
+                    
+                    return MIN(4, minCount);
+                }
                 
             }
-            
-            return MIN(4, minCount);
         }
     }
     else if(currentViewType == CategoriesView)
     {
-        return 0;
+        if (searching) 
+        {
+            NSArray *searchResults = [[RequestsManager sharedManager] searchResultsForTerm: self.searchBar.text];
+            
+            return [searchResults count];
+        }
+        else
+        {
+            return 0;
+        }
     }
     else if(currentViewType == CustomView)
     {
-        return [[PreferencesManager sharedManager].userAddedStations count];
+        if (searching) 
+        {
+            NSArray *results = [[RequestsManager sharedManager] searchForTermInUserStations: self.searchBar.text];
+            return [results count];
+        }
+        else
+        {
+            return [[PreferencesManager sharedManager].userAddedStations count];
+        }
     }
     
     return 0;
@@ -619,23 +750,30 @@
 
 -(CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (currentViewType == ListView) 
+    if (searching) 
     {
-        if (indexPath.row == 0 || 
-            (indexPath.row == [self tableView:self.tbView numberOfRowsInSection: indexPath.section] - 1
-             && indexPath.section != selectedSection && indexPath.row == 3)) 
+        return 55.0f;
+    }
+    else
+    {
+        if (currentViewType == ListView) 
         {
-            return 32.0f;
+            if (indexPath.row == 0 || 
+                (indexPath.row == [self tableView:self.tbView numberOfRowsInSection: indexPath.section] - 1
+                 && indexPath.section != selectedSection && indexPath.row == 3)) 
+            {
+                return 32.0f;
+            }
+            else
+            {
+                return 55.0f;
+            }
         }
-        else
+        else if(currentViewType == CategoriesView 
+                || currentViewType == CustomView)
         {
             return 55.0f;
         }
-    }
-    else if(currentViewType == CategoriesView 
-            || currentViewType == CustomView)
-    {
-        return 55.0f;
     }
     
     return 44.0f;
@@ -710,7 +848,7 @@
             return 5.0f;
         }
     }
-    else if(currentViewType == CategoriesView)
+    else if(currentViewType == CategoriesView && !searching)
     {
         if (!section) 
         {

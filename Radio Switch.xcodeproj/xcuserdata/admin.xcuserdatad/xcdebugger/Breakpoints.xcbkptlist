@@ -9,12 +9,12 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Radio Switch/StationsListViewController.m"
-         timestampString = "364852526.779117"
+         timestampString = "364933585.067553"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"
-         startingLineNumber = "577"
-         endingLineNumber = "577"
-         landmarkName = "-saveAndDismiss"
+         startingLineNumber = "673"
+         endingLineNumber = "673"
+         landmarkName = "-tableView:numberOfRowsInSection:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -23,12 +23,12 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Radio Switch/StationsListViewController.m"
-         timestampString = "364852526.779117"
+         timestampString = "364933585.067553"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"
-         startingLineNumber = "322"
-         endingLineNumber = "322"
-         landmarkName = "-saveAndDismiss"
+         startingLineNumber = "368"
+         endingLineNumber = "368"
+         landmarkName = "-tableView:cellForRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -37,12 +37,12 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Radio Switch/StationsListViewController.m"
-         timestampString = "364852526.779117"
+         timestampString = "364933244.326003"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"
-         startingLineNumber = "180"
-         endingLineNumber = "180"
-         landmarkName = "-saveAndDismiss"
+         startingLineNumber = "218"
+         endingLineNumber = "218"
+         landmarkName = "-dismissPicker"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -51,13 +51,27 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Radio Switch/SmartAnalyzer.h"
-         timestampString = "364850585.534365"
+         timestampString = "364916700.36425"
          startingColumnNumber = "2147483647"
          endingColumnNumber = "2147483647"
-         startingLineNumber = "40"
-         endingLineNumber = "40"
+         startingLineNumber = "43"
+         endingLineNumber = "43"
          landmarkName = "@interface SmartAnalyzer"
          landmarkType = "2">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         isPathRelative = "1"
+         filePath = "Radio Switch/SmartAnalyzer.m"
+         timestampString = "364917268.750133"
+         startingColumnNumber = "2147483647"
+         endingColumnNumber = "2147483647"
+         startingLineNumber = "151"
+         endingLineNumber = "151"
+         landmarkName = "-searchForCorrectUrl:"
+         landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
    <ExceptionBreakpoints>

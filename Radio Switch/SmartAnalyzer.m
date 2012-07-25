@@ -8,6 +8,7 @@
 
 #import "SmartAnalyzer.h"
 #import "ASIHTTPRequest.h"
+#import "RequestsManager.h"
 
 @implementation SmartAnalyzer
 
@@ -15,7 +16,7 @@ static SmartAnalyzer *sharedAnalyzer = nil;
 
 @synthesize analyzedQue, pagesToAnalyze, delegate, analyzerBusy, errorSelector, successSelector, lastAnalyzerResult;
 
-@synthesize lastURLToAnalyze;
+@synthesize lastURLToAnalyze, resultsToIgnore;
 
 +(SmartAnalyzer *) sharedAnalyzer
 {
@@ -50,6 +51,7 @@ static SmartAnalyzer *sharedAnalyzer = nil;
     if (self) 
     {
         self.pagesToAnalyze = [NSMutableArray array];
+        self.resultsToIgnore = [NSMutableArray array];
     }
     
     return self;
@@ -88,9 +90,44 @@ static SmartAnalyzer *sharedAnalyzer = nil;
 
 - (void)requestFinished:(ASIHTTPRequest *)request
 {
+    analyzerBusy = NO;
+    
     NSString *responseString = [request responseString];
     
+    NSString *searchResult = [self searchForCorrectUrl: responseString];
     
+    if (searchResult != nil) 
+    {
+        if (self.delegate && self.successSelector 
+            && [self.delegate respondsToSelector: self.successSelector]) 
+        {
+            [self.delegate performSelector: self.successSelector withObject:self.lastURLToAnalyze withObject: searchResult];
+        }
+    }
+    else
+    {
+        if (self.delegate && self.errorSelector 
+            && [self.delegate respondsToSelector:self.errorSelector]) 
+        {
+            [self.delegate performSelector: self.errorSelector withObject: self.lastURLToAnalyze];
+        }
+    }
+    
+    if ([self.pagesToAnalyze count]) 
+    {
+        if ([self.pagesToAnalyze count]) 
+        {
+            NSDictionary *queItem = [self.pagesToAnalyze lastObject];
+            
+            [[SmartAnalyzer sharedAnalyzer] analyzeUrl:
+             [queItem objectForKey:@"urlToAnalyze"] 
+                                          withDelegate: [queItem objectForKey:@"delegate"] 
+                                      andErrorSelector:NSSelectorFromString([queItem objectForKey:@"errorSelector"]) 
+                                    andSuccessSelector: NSSelectorFromString([queItem objectForKey: @"successSelector"])];
+            
+            [self.pagesToAnalyze removeLastObject];
+        }
+    }
 }
 
 -(NSString *) searchForCorrectUrl: (NSString *) responseString
@@ -104,8 +141,6 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                                    @".pla", @".plc", @".smil", @".vlc", 
                                    @"wpl", @".zpl", nil];
                                                 
-           
-    BOOL urlFound = NO;
     
     for(NSString *extension in extensionsToSearch)
     {
@@ -113,18 +148,52 @@ static SmartAnalyzer *sharedAnalyzer = nil;
         
         if (extensionRange.location != NSNotFound) 
         {
+            NSLog(@"extension found - %@", extension);
             
+            NSRange delimiterSpace = [responseString rangeOfCharacterFromSet: 
+                                      [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:NSBackwardsSearch 
+                                                                       range:NSMakeRange(0, extensionRange.location)];
+            
+            if (delimiterSpace.location != NSNotFound) 
+            {
+                self.lastAnalyzerResult = [[responseString substringFromIndex: delimiterSpace.location + 1] substringToIndex: extensionRange.location - delimiterSpace.location + [extension length] - 1];
+                
+                NSLog(@"url to check - %@", self.lastAnalyzerResult);
+                
+                BOOL isCorrect = [[RequestsManager sharedManager] performURLCheckAndReturn: self.lastAnalyzerResult];
+                
+                if (isCorrect) 
+                {
+                    if (![self.resultsToIgnore containsObject: self.lastAnalyzerResult]) 
+                    {
+                        return self.lastAnalyzerResult;
+                    }
+                    else
+                    {
+                        self.lastAnalyzerResult = nil;
+                        continue;
+                    }
+                }
+                else
+                {
+                    self.lastAnalyzerResult = nil;
+                    continue;
+                }
+                
+                 NSLog(@"analyzer result - %@", self.lastAnalyzerResult);
+            }
         }
     }
-                                   
+    
+    return nil;
 }
 
 - (void)requestFailed:(ASIHTTPRequest *)request
 {
+    analyzerBusy = NO;
+    
     if ([self.pagesToAnalyze count]) 
     {
-        [self.pagesToAnalyze removeLastObject];
-        
         if ([self.pagesToAnalyze count]) 
         {
             NSDictionary *queItem = [self.pagesToAnalyze lastObject];
@@ -134,6 +203,8 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                                           withDelegate: [queItem objectForKey:@"delegate"] 
                                       andErrorSelector:NSSelectorFromString([queItem objectForKey:@"errorSelector"]) 
                                     andSuccessSelector: NSSelectorFromString([queItem objectForKey: @"successSelector"])];
+            
+            [self.pagesToAnalyze removeLastObject];
         }
     }
     

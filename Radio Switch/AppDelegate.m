@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "RequestsManager.h"
+#import "SmartAnalyzer.h"
 
 @implementation AppDelegate
 

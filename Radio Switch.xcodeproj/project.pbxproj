@@ -100,6 +100,13 @@
 		84F795AF15B9A2F200D10316 /* SmallContentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84F795AD15B9A2F200D10316 /* SmallContentCell.xib */; };
 		84F795B415B9A97300D10316 /* MoreCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F795B215B9A97300D10316 /* MoreCell.m */; };
 		84F795B515B9A97300D10316 /* MoreCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84F795B315B9A97300D10316 /* MoreCell.xib */; };
+		84FD723215C0177A0007C3F2 /* BrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FD723015C0177A0007C3F2 /* BrowserViewController.m */; };
+		84FD723315C0177A0007C3F2 /* BrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84FD723115C0177A0007C3F2 /* BrowserViewController.xib */; };
+		84FD723915C018350007C3F2 /* ico_next.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FD723515C018350007C3F2 /* ico_next.png */; };
+		84FD723A15C018350007C3F2 /* ico_next@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FD723615C018350007C3F2 /* ico_next@2x.png */; };
+		84FD723B15C018350007C3F2 /* ico_prev.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FD723715C018350007C3F2 /* ico_prev.png */; };
+		84FD723C15C018350007C3F2 /* ico_prev@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84FD723815C018350007C3F2 /* ico_prev@2x.png */; };
+		84FD723E15C01F3B0007C3F2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84FD723D15C01F3B0007C3F2 /* QuartzCore.framework */; };
 		B295BEF315A6F0EE004300D2 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B295BEF215A6F0EE004300D2 /* CoreData.framework */; };
 /* End PBXBuildFile section */
 
@@ -240,6 +247,14 @@
 		84F795B115B9A97300D10316 /* MoreCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoreCell.h; sourceTree = "<group>"; };
 		84F795B215B9A97300D10316 /* MoreCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoreCell.m; sourceTree = "<group>"; };
 		84F795B315B9A97300D10316 /* MoreCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MoreCell.xib; sourceTree = "<group>"; };
+		84FD722F15C017790007C3F2 /* BrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowserViewController.h; sourceTree = "<group>"; };
+		84FD723015C0177A0007C3F2 /* BrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowserViewController.m; sourceTree = "<group>"; };
+		84FD723115C0177A0007C3F2 /* BrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BrowserViewController.xib; sourceTree = "<group>"; };
+		84FD723515C018350007C3F2 /* ico_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ico_next.png; sourceTree = "<group>"; };
+		84FD723615C018350007C3F2 /* ico_next@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ico_next@2x.png"; sourceTree = "<group>"; };
+		84FD723715C018350007C3F2 /* ico_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ico_prev.png; sourceTree = "<group>"; };
+		84FD723815C018350007C3F2 /* ico_prev@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ico_prev@2x.png"; sourceTree = "<group>"; };
+		84FD723D15C01F3B0007C3F2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		B295BEF215A6F0EE004300D2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -248,6 +263,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84FD723E15C01F3B0007C3F2 /* QuartzCore.framework in Frameworks */,
 				B295BEF315A6F0EE004300D2 /* CoreData.framework in Frameworks */,
 				842097DD15A4E8CD00FB3E62 /* libz.1.2.5.dylib in Frameworks */,
 				842096DD15A4C7F600FB3E62 /* CoreGraphics.framework in Frameworks */,
@@ -314,6 +330,9 @@
 			children = (
 				841B6FDB15BF118E001F1DD7 /* SmartAnalyzer.h */,
 				841B6FDC15BF118E001F1DD7 /* SmartAnalyzer.m */,
+				84FD722F15C017790007C3F2 /* BrowserViewController.h */,
+				84FD723015C0177A0007C3F2 /* BrowserViewController.m */,
+				84FD723115C0177A0007C3F2 /* BrowserViewController.xib */,
 			);
 			name = SmartBrowser;
 			sourceTree = "<group>";
@@ -321,6 +340,7 @@
 		842096C915A4C7F600FB3E62 = {
 			isa = PBXGroup;
 			children = (
+				84FD723D15C01F3B0007C3F2 /* QuartzCore.framework */,
 				84BE057F15AB850F007B3524 /* backup */,
 				B295BEF215A6F0EE004300D2 /* CoreData.framework */,
 				842097DC15A4E8CD00FB3E62 /* libz.1.2.5.dylib */,
@@ -445,6 +465,10 @@
 		8420972515A4E1BA00FB3E62 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				84FD723515C018350007C3F2 /* ico_next.png */,
+				84FD723615C018350007C3F2 /* ico_next@2x.png */,
+				84FD723715C018350007C3F2 /* ico_prev.png */,
+				84FD723815C018350007C3F2 /* ico_prev@2x.png */,
 				8407319015BEB311007E6916 /* grayBtn.png */,
 				8407319115BEB311007E6916 /* grayBtn@2x.png */,
 				8407318215BE9D34007E6916 /* inputBg.png */,
@@ -678,6 +702,11 @@
 				8407318515BE9D34007E6916 /* inputBg@2x.png in Resources */,
 				8407319215BEB311007E6916 /* grayBtn.png in Resources */,
 				8407319315BEB311007E6916 /* grayBtn@2x.png in Resources */,
+				84FD723315C0177A0007C3F2 /* BrowserViewController.xib in Resources */,
+				84FD723915C018350007C3F2 /* ico_next.png in Resources */,
+				84FD723A15C018350007C3F2 /* ico_next@2x.png in Resources */,
+				84FD723B15C018350007C3F2 /* ico_prev.png in Resources */,
+				84FD723C15C018350007C3F2 /* ico_prev@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,6 +745,7 @@
 				841B6FD515BF10EE001F1DD7 /* ASINetworkQueue.m in Sources */,
 				841B6FD915BF1149001F1DD7 /* Reachability.m in Sources */,
 				841B6FDD15BF118E001F1DD7 /* SmartAnalyzer.m in Sources */,
+				84FD723215C0177A0007C3F2 /* BrowserViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

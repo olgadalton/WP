@@ -45,4 +45,9 @@
 -(void) urlIsCorrect: (NSString *) url andResultSelector: (SEL) resultSelector andDelegate: (id) delegate;
 -(void) performURLCheck: (NSDictionary *) data;
 
+-(BOOL) performURLCheckAndReturn: (NSString *) url;
+
+-(NSMutableArray *) searchResultsForTerm: (NSString *) searchTerm;
+-(NSArray *) searchForTermInUserStations: (NSString *) term;
+
 @end

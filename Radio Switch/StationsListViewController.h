@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "CategoryListPopup.h"
 #import "FixedTextField.h"
+#import "BrowserViewController.h"
 
 enum ViewType {
     CategoriesView = 0,
@@ -18,7 +19,7 @@ enum ViewType {
     };
 
 @interface StationsListViewController : UIViewController 
-                                        <UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate>
+                                        <UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate, UISearchBarDelegate>
 {
     IBOutlet UITableView *tbView;
     
@@ -44,9 +45,16 @@ enum ViewType {
     BOOL editingInProcess;
     
     IBOutlet UIButton *addStationButton;
+    IBOutlet BrowserViewController *analyzingBrowser;
+    
+    IBOutlet UISearchBar *searchBar;
+    
+    BOOL searching;
 }
 
 @property (nonatomic, retain) IBOutlet UITableView *tbView;
+
+@property (nonatomic, retain) IBOutlet BrowserViewController *analyzingBrowser;
 
 @property (nonatomic, retain) IBOutlet UISegmentedControl *viewSelector;
 
@@ -61,6 +69,8 @@ enum ViewType {
 @property (nonatomic, retain) FixedTextField *currentTextField;
 
 @property (nonatomic, retain) IBOutlet UIButton *addStationButton;
+
+@property (nonatomic, retain) IBOutlet UISearchBar *searchBar;
 
 -(IBAction)viewTypeChanged:(id)sender;
 -(IBAction)categoryButtonPressed:(id)sender;

@@ -20,6 +20,8 @@
     SEL successSelector;
     
     NSString *lastURLToAnalyze;
+    
+    NSMutableArray *resultsToIgnore;
 }
 
 @property (nonatomic, retain) NSMutableArray *analyzedQue, *pagesToAnalyze;
@@ -27,6 +29,7 @@
 @property BOOL analyzerBusy;
 @property SEL errorSelector, successSelector;
 @property (nonatomic, retain) NSString *lastAnalyzerResult, *lastURLToAnalyze;
+@property (nonatomic, retain) NSMutableArray *resultsToIgnore;
 
 +(SmartAnalyzer *) sharedAnalyzer;
 

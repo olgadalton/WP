@@ -9,6 +9,7 @@
 #import "RequestsManager.h"
 #import "RequestsHandler.h"
 #import "JSONKit.h"
+#import "PreferencesManager.h"
 
 @implementation RequestsManager
 @synthesize handler, tempDataHolder, allData, waitAlert;
@@ -67,6 +68,49 @@ static RequestsManager *sharedRequestsManager = nil;
                             afterDelay: 0.5f];
 }
 
+-(NSMutableArray *) searchResultsForTerm: (NSString *) searchTerm
+{
+    NSMutableArray *searchResults = [NSMutableArray array];
+    
+    for (NSDictionary *category in self.allData) 
+    {
+        NSArray *stations = [category objectForKey: @"stations"];
+        
+        for (NSDictionary *station in stations) 
+        {
+            NSString *name = [station objectForKey: @"name"];
+            NSString *country = [station objectForKey: @"country"];
+            NSString *streamurl = [station objectForKey: @"streamurl"];
+            
+            if ([[name lowercaseString] rangeOfString: [searchTerm lowercaseString]].location != NSNotFound
+                || [[country lowercaseString] rangeOfString: [searchTerm lowercaseString]].location != NSNotFound
+                || [[streamurl lowercaseString] rangeOfString: [searchTerm lowercaseString]].location != NSNotFound) 
+            {
+                [searchResults addObject: station];
+            }
+        }
+    }
+    return searchResults;
+}
+
+-(NSArray *) searchForTermInUserStations: (NSString *) term
+{
+    NSMutableArray *results = [NSMutableArray array];
+    
+    for (NSDictionary *station in [PreferencesManager sharedManager].userAddedStations) 
+    {
+        NSString *name = [station objectForKey: @"name"];
+        NSString *streamurl = [station objectForKey: @"streamurl"];
+        
+        if ([[name lowercaseString] rangeOfString: [term lowercaseString]].location != NSNotFound 
+            || [[streamurl lowercaseString] rangeOfString:[term lowercaseString]].location != NSNotFound) 
+        {
+            [results addObject: station];
+        }
+    }
+    return results;
+}
+
 -(void) performURLCheck: (NSDictionary *) data
 {
     NSURL *myURL = [NSURL URLWithString: [data objectForKey: @"url"]];
@@ -95,6 +139,26 @@ static RequestsManager *sharedRequestsManager = nil;
     {
         [delegate performSelector: resultSelector withObject: [NSNumber numberWithBool: reachable]];
     }
+}
+
+-(BOOL) performURLCheckAndReturn: (NSString *) url
+{
+    NSURL *myURL = [NSURL URLWithString: url];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: myURL];
+    [request setHTTPMethod: @"HEAD"];
+    NSURLResponse *response;
+    NSError *error;
+    NSData *myData = [NSURLConnection sendSynchronousRequest: request returningResponse: &response error: &error];
+    BOOL reachable;
+    
+    if (myData) {
+        // we are probably reachable, check the response
+        reachable = YES;
+    } else {
+        // we are probably not reachable, check the error:
+        reachable = NO;
+    }
+    return reachable;
 }
 
 -(void) loadRadiosListAndSave
