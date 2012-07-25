@@ -46,7 +46,7 @@
 								<string key="NSFrame">{{9, 5}, {221, 20}}</string>
 								<reference key="NSSuperview" ref="1049719415"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="796333167"/>
+								<reference key="NSNextKeyView" ref="595604508"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -78,7 +78,7 @@
 								<string key="NSFrame">{{9, 25}, {279, 21}}</string>
 								<reference key="NSSuperview" ref="1049719415"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="731886623"/>
+								<reference key="NSNextKeyView" ref="796333167"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -94,7 +94,7 @@
 									<bytes key="NSRGB">MSAxIDEAA</bytes>
 								</object>
 								<int key="IBUIBaselineAdjustment">1</int>
-								<float key="IBUIMinimumFontSize">10</float>
+								<float key="IBUIMinimumFontSize">14</float>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
 									<string key="name">TimesNewRomanPSMT</string>
 									<string key="family">Times New Roman</string>
@@ -113,7 +113,7 @@
 								<string key="NSFrame">{{242, 5}, {53, 21}}</string>
 								<reference key="NSSuperview" ref="1049719415"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="595604508"/>
+								<reference key="NSNextKeyView" ref="731886623"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>

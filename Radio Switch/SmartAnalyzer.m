@@ -139,9 +139,10 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                                    @".mp3", @".pls", @".m3u", @".xspf", 
                                    @".asx", @".bio", @".fpl", @".kpl", 
                                    @".pla", @".plc", @".smil", @".vlc", 
-                                   @"wpl", @".zpl", nil];
-                                                
+                                   @".wpl", @".zpl", nil];
     
+    
+    // Needs ranges check, and swithc to i for!
     for(NSString *extension in extensionsToSearch)
     {
         NSRange extensionRange = [responseString rangeOfString: extension];
@@ -180,10 +181,90 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                     continue;
                 }
                 
-                 NSLog(@"analyzer result - %@", self.lastAnalyzerResult);
+                NSLog(@"analyzer result - %@", self.lastAnalyzerResult);
             }
         }
     }
+    
+    NSArray *partialExtensionsToSearch = [NSArray arrayWithObjects: @"m4a", @"m4b", @"m4p", @"m4r", 
+                                          @"3gp", @"mp4", @"aac", @"amr", 
+                                          @"lbc", @"aiff", @"aif", @"aifc", 
+                                          @"l16", @"wav", @"au", @"pcm", 
+                                          @"mp3", @"pls", @"m3u", @"xspf", 
+                                          @"asx", @"bio", @"fpl", @"kpl", 
+                                          @"pla", @"plc", @"smil", @"vlc", 
+                                          @"wpl", @"zpl", nil];
+    
+    for(NSString *extension in partialExtensionsToSearch)
+    {
+        NSRange extensionRange = [responseString rangeOfString: extension];
+        
+        if (extensionRange.location != NSNotFound) 
+        {
+            NSRange delimiterSpace = [responseString rangeOfCharacterFromSet: 
+                                      [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:NSBackwardsSearch 
+                                                                       range:NSMakeRange(0, extensionRange.location)];
+            
+            NSRange otherDelimiterSpace = [responseString rangeOfCharacterFromSet: 
+                                           [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:0 
+                                                                            range:NSMakeRange(extensionRange.location, [responseString length] -  extensionRange.location - 1)];
+            
+            if (delimiterSpace.location != NSNotFound && otherDelimiterSpace.location != NSNotFound) 
+            {
+                self.lastAnalyzerResult = [[responseString substringFromIndex: delimiterSpace.location + 1] substringToIndex: otherDelimiterSpace.location - delimiterSpace.location];
+                
+                NSLog(@"url to check - %@", self.lastAnalyzerResult);
+                
+                BOOL isCorrect = [[RequestsManager sharedManager] performURLCheckAndReturn: self.lastAnalyzerResult];
+                
+                if (isCorrect) 
+                {
+                    if (![self.resultsToIgnore containsObject: self.lastAnalyzerResult]) 
+                    {
+                        return self.lastAnalyzerResult;
+                    }
+                    else
+                    {
+                        self.lastAnalyzerResult = nil;
+                        
+                        NSRange extensionRange2 = [responseString rangeOfString: extension options:0 range:NSMakeRange(otherDelimiterSpace.location, [responseString length] - otherDelimiterSpace.location - 1)];
+                        
+                        if (extensionRange2.location != NSNotFound) 
+                        {
+                            NSRange delimiterSpace2 = [responseString rangeOfCharacterFromSet: 
+                                                       [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:NSBackwardsSearch 
+                                                                                        range:NSMakeRange(0, extensionRange2.location)];
+                            
+                            NSRange otherDelimiterSpace2 = [responseString rangeOfCharacterFromSet: 
+                                                            [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:0 
+                                                                                             range:NSMakeRange(extensionRange2.location, [responseString length] -  extensionRange2.location - 1)];
+                            
+                            if (delimiterSpace2.location != NSNotFound && otherDelimiterSpace2.location != NSNotFound) 
+                            {
+                                self.lastAnalyzerResult = [[responseString substringFromIndex: delimiterSpace2.location + 1] substringToIndex: otherDelimiterSpace2.location - delimiterSpace2.location];
+                                
+                                if (![self.resultsToIgnore containsObject: self.lastAnalyzerResult]) 
+                                {
+                                    return self.lastAnalyzerResult;
+                                }
+                                else
+                                {
+                                    self.lastAnalyzerResult = nil;
+                                }
+                            }
+                        }
+                    }}
+                else
+                {
+                    self.lastAnalyzerResult = nil;
+                    continue;
+                }
+                
+                NSLog(@"analyzer result - %@", self.lastAnalyzerResult);
+            }
+        }
+    }
+    
     
     return nil;
 }
@@ -199,7 +280,7 @@ static SmartAnalyzer *sharedAnalyzer = nil;
             NSDictionary *queItem = [self.pagesToAnalyze lastObject];
             
             [[SmartAnalyzer sharedAnalyzer] analyzeUrl:
-                            [queItem objectForKey:@"urlToAnalyze"] 
+             [queItem objectForKey:@"urlToAnalyze"] 
                                           withDelegate: [queItem objectForKey:@"delegate"] 
                                       andErrorSelector:NSSelectorFromString([queItem objectForKey:@"errorSelector"]) 
                                     andSuccessSelector: NSSelectorFromString([queItem objectForKey: @"successSelector"])];
