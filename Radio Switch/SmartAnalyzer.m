@@ -141,11 +141,13 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                                    @".pla", @".plc", @".smil", @".vlc", 
                                    @".wpl", @".zpl", nil];
     
+    int lastStartLocation = 0;
     
-    // Needs ranges check, and swithc to i for!
-    for(NSString *extension in extensionsToSearch)
+    for(int i = 0; i < [extensionsToSearch count]; i++)
     {
-        NSRange extensionRange = [responseString rangeOfString: extension];
+        NSString *extension = [extensionsToSearch objectAtIndex: i];
+        
+        NSRange extensionRange = [responseString rangeOfString: extension options:0 range:NSMakeRange(lastStartLocation, [responseString length] - lastStartLocation)];
         
         if (extensionRange.location != NSNotFound) 
         {
@@ -163,25 +165,60 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                 
                 BOOL isCorrect = [[RequestsManager sharedManager] performURLCheckAndReturn: self.lastAnalyzerResult];
                 
-                if (isCorrect) 
+                NSLog(@"is correct - %d", isCorrect);
+                
+                NSLog(@"errors found - %d", [self streamIsCorrectForKnownExceptions:self.lastAnalyzerResult]);
+                
+                if (isCorrect && [self streamIsCorrectForKnownExceptions:self.lastAnalyzerResult]) 
                 {
                     if (![self.resultsToIgnore containsObject: self.lastAnalyzerResult]) 
                     {
+                        NSLog(@"returning");
                         return self.lastAnalyzerResult;
                     }
                     else
                     {
+                        
+                        NSLog(@"contains in skipping");
                         self.lastAnalyzerResult = nil;
+                        i--;
+                        lastStartLocation = extensionRange.location + [extension length];
                         continue;
                     }
                 }
                 else
                 {
-                    self.lastAnalyzerResult = nil;
-                    continue;
+                    
+                    if (![self.lastAnalyzerResult hasPrefix:@"/"]) 
+                    {
+                        self.lastAnalyzerResult = [@"/" stringByAppendingString: self.lastAnalyzerResult];
+                    }
+                    
+                    NSLog(@"longer url to analyze - %@", [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]);
+                    
+                    BOOL isCorrect = [[RequestsManager sharedManager] performURLCheckAndReturn: [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]];
+                    
+                    if (isCorrect && [self streamIsCorrectForKnownExceptions: [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]]) 
+                    {
+                        if (![self.resultsToIgnore containsObject: [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]]) 
+                        {
+                            return [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult];
+                        }
+                        else
+                        {
+                            self.lastAnalyzerResult = nil;
+                            i--;
+                            lastStartLocation = extensionRange.location + [extension length];
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        self.lastAnalyzerResult = nil;
+                        lastStartLocation = 0;
+                        continue;
+                    }
                 }
-                
-                NSLog(@"analyzer result - %@", self.lastAnalyzerResult);
             }
         }
     }
@@ -193,14 +230,20 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                                           @"mp3", @"pls", @"m3u", @"xspf", 
                                           @"asx", @"bio", @"fpl", @"kpl", 
                                           @"pla", @"plc", @"smil", @"vlc", 
-                                          @"wpl", @"zpl", nil];
+                                          @"wpl", @"zpl", @"radio", nil];
     
-    for(NSString *extension in partialExtensionsToSearch)
+    lastStartLocation = 0;
+    
+    for(int i = 0; i < [partialExtensionsToSearch count]; i++)
     {
-        NSRange extensionRange = [responseString rangeOfString: extension];
+        NSString *extension = [partialExtensionsToSearch objectAtIndex: i];
+        
+        NSRange extensionRange = [responseString rangeOfString: extension options:0 range:NSMakeRange(lastStartLocation, [responseString length] - lastStartLocation)];
         
         if (extensionRange.location != NSNotFound) 
         {
+            NSLog(@"extension found - %@", extension);
+            
             NSRange delimiterSpace = [responseString rangeOfCharacterFromSet: 
                                       [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:NSBackwardsSearch 
                                                                        range:NSMakeRange(0, extensionRange.location)];
@@ -217,47 +260,49 @@ static SmartAnalyzer *sharedAnalyzer = nil;
                 
                 BOOL isCorrect = [[RequestsManager sharedManager] performURLCheckAndReturn: self.lastAnalyzerResult];
                 
-                if (isCorrect) 
+                if (isCorrect && [self streamIsCorrectForKnownExceptions:self.lastAnalyzerResult]) 
                 {
                     if (![self.resultsToIgnore containsObject: self.lastAnalyzerResult]) 
                     {
-                        return self.lastAnalyzerResult;
+                        return [self clearUrl: self.lastAnalyzerResult];
+                    }
+                    else
+                    {
+                        lastStartLocation = extensionRange.location + [extension length];
+                        i--;
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (![self.lastAnalyzerResult hasPrefix:@"/"]) 
+                    {
+                        self.lastAnalyzerResult = [@"/" stringByAppendingString: self.lastAnalyzerResult];
+                    }
+                    
+                    NSLog(@"new longer url to analyze - %@", [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]);
+                    
+                    BOOL isCorrect = [[RequestsManager sharedManager] performURLCheckAndReturn: [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]];
+                    
+                    if (isCorrect && [self streamIsCorrectForKnownExceptions:[self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]]) 
+                    {
+                        if (![self.resultsToIgnore containsObject: [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]]) 
+                        {
+                            return [self clearUrl: [self.lastURLToAnalyze stringByAppendingString: self.lastAnalyzerResult]];
+                        }
+                        else
+                        {
+                            lastStartLocation = extensionRange.location + [extension length];
+                            i--;
+                            continue;
+                        }
                     }
                     else
                     {
                         self.lastAnalyzerResult = nil;
-                        
-                        NSRange extensionRange2 = [responseString rangeOfString: extension options:0 range:NSMakeRange(otherDelimiterSpace.location, [responseString length] - otherDelimiterSpace.location - 1)];
-                        
-                        if (extensionRange2.location != NSNotFound) 
-                        {
-                            NSRange delimiterSpace2 = [responseString rangeOfCharacterFromSet: 
-                                                       [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:NSBackwardsSearch 
-                                                                                        range:NSMakeRange(0, extensionRange2.location)];
-                            
-                            NSRange otherDelimiterSpace2 = [responseString rangeOfCharacterFromSet: 
-                                                            [NSCharacterSet characterSetWithCharactersInString:@"\"'"] options:0 
-                                                                                             range:NSMakeRange(extensionRange2.location, [responseString length] -  extensionRange2.location - 1)];
-                            
-                            if (delimiterSpace2.location != NSNotFound && otherDelimiterSpace2.location != NSNotFound) 
-                            {
-                                self.lastAnalyzerResult = [[responseString substringFromIndex: delimiterSpace2.location + 1] substringToIndex: otherDelimiterSpace2.location - delimiterSpace2.location];
-                                
-                                if (![self.resultsToIgnore containsObject: self.lastAnalyzerResult]) 
-                                {
-                                    return self.lastAnalyzerResult;
-                                }
-                                else
-                                {
-                                    self.lastAnalyzerResult = nil;
-                                }
-                            }
-                        }
-                    }}
-                else
-                {
-                    self.lastAnalyzerResult = nil;
-                    continue;
+                        lastStartLocation = 0;
+                        continue;
+                    }
                 }
                 
                 NSLog(@"analyzer result - %@", self.lastAnalyzerResult);
@@ -267,6 +312,28 @@ static SmartAnalyzer *sharedAnalyzer = nil;
     
     
     return nil;
+}
+
+-(BOOL) streamIsCorrectForKnownExceptions: (NSString *) url
+{
+    if ([url rangeOfString:@"shockwave"].location != NSNotFound) 
+    {
+        return NO;
+    }
+    
+    if ([url rangeOfString: @".js"].location != NSNotFound) 
+    {
+        return NO;
+    }
+    
+    return YES;
+}
+
+-(NSString *) clearUrl: (NSString *) url
+{
+    url = [url stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    url = [url stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\"'"]];
+    return url;
 }
 
 - (void)requestFailed:(ASIHTTPRequest *)request

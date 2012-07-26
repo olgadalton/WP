@@ -321,8 +321,8 @@
     [self.goButton.layer setMasksToBounds: YES];
     [self.goButton.layer setCornerRadius: 3.0f];
     
-    [self.webView loadRequest: [NSURLRequest requestWithURL: [NSURL URLWithString: @"http://www.google.ee"]]];
-    [self.addressBar setText: @"http://www.google.ee"];
+    [self.webView loadRequest: [NSURLRequest requestWithURL: [NSURL URLWithString: @"http://www.shoutcast.com"]]];
+    [self.addressBar setText: @"http://www.shoutcast.com"];
     
     [self.backButton setEnabled: NO];
     [self.nextButton setEnabled: NO];

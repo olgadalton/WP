@@ -40,4 +40,8 @@
 
 -(NSString *) searchForCorrectUrl: (NSString *) responseString;
 
+-(BOOL) streamIsCorrectForKnownExceptions: (NSString *) url;
+
+-(NSString *) clearUrl: (NSString *) url;
+
 @end
