@@ -54,6 +54,11 @@
 		842097F815A4F95000FB3E62 /* ContentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 842097F615A4F95000FB3E62 /* ContentCell.xib */; };
 		8471FB2E15A9B03F00986447 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8471FB2C15A9B03F00986447 /* icon.png */; };
 		8471FB2F15A9B03F00986447 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8471FB2D15A9B03F00986447 /* icon@2x.png */; };
+		84BC906F15C2E654004123C3 /* ChoiceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC906D15C2E654004123C3 /* ChoiceCell.m */; };
+		84BC907015C2E654004123C3 /* ChoiceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC906E15C2E654004123C3 /* ChoiceCell.xib */; };
+		84BC907415C2EA7B004123C3 /* DoubleChoiceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC907215C2EA7B004123C3 /* DoubleChoiceCell.m */; };
+		84BC907515C2EA7B004123C3 /* DoubleChoiceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC907315C2EA7B004123C3 /* DoubleChoiceCell.xib */; };
+		84BC907715C2EC15004123C3 /* selected_bg_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 84BC907615C2EC15004123C3 /* selected_bg_blue.png */; };
 		84BE057C15AB6976007B3524 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 84BE057B15AB6976007B3524 /* Default.png */; };
 		84BE057E15AB6993007B3524 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84BE057D15AB6993007B3524 /* Default@2x.png */; };
 		84BE058115AB8555007B3524 /* cache.dat in Resources */ = {isa = PBXBuildFile; fileRef = 84BE058015AB8555007B3524 /* cache.dat */; };
@@ -197,6 +202,13 @@
 		842097F615A4F95000FB3E62 /* ContentCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ContentCell.xib; sourceTree = "<group>"; };
 		8471FB2C15A9B03F00986447 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		8471FB2D15A9B03F00986447 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
+		84BC906C15C2E654004123C3 /* ChoiceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChoiceCell.h; sourceTree = "<group>"; };
+		84BC906D15C2E654004123C3 /* ChoiceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChoiceCell.m; sourceTree = "<group>"; };
+		84BC906E15C2E654004123C3 /* ChoiceCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChoiceCell.xib; sourceTree = "<group>"; };
+		84BC907115C2EA7A004123C3 /* DoubleChoiceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DoubleChoiceCell.h; sourceTree = "<group>"; };
+		84BC907215C2EA7B004123C3 /* DoubleChoiceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DoubleChoiceCell.m; sourceTree = "<group>"; };
+		84BC907315C2EA7B004123C3 /* DoubleChoiceCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DoubleChoiceCell.xib; sourceTree = "<group>"; };
+		84BC907615C2EC15004123C3 /* selected_bg_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selected_bg_blue.png; sourceTree = "<group>"; };
 		84BE057B15AB6976007B3524 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		84BE057D15AB6993007B3524 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		84BE058015AB8555007B3524 /* cache.dat */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = cache.dat; sourceTree = "<group>"; };
@@ -465,6 +477,7 @@
 		8420972515A4E1BA00FB3E62 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				84BC907615C2EC15004123C3 /* selected_bg_blue.png */,
 				84FD723515C018350007C3F2 /* ico_next.png */,
 				84FD723615C018350007C3F2 /* ico_next@2x.png */,
 				84FD723715C018350007C3F2 /* ico_prev.png */,
@@ -568,6 +581,12 @@
 				84F795B115B9A97300D10316 /* MoreCell.h */,
 				84F795B215B9A97300D10316 /* MoreCell.m */,
 				84F795B315B9A97300D10316 /* MoreCell.xib */,
+				84BC906C15C2E654004123C3 /* ChoiceCell.h */,
+				84BC906D15C2E654004123C3 /* ChoiceCell.m */,
+				84BC906E15C2E654004123C3 /* ChoiceCell.xib */,
+				84BC907115C2EA7A004123C3 /* DoubleChoiceCell.h */,
+				84BC907215C2EA7B004123C3 /* DoubleChoiceCell.m */,
+				84BC907315C2EA7B004123C3 /* DoubleChoiceCell.xib */,
 			);
 			name = "Select tab custom cells";
 			sourceTree = "<group>";
@@ -707,6 +726,9 @@
 				84FD723A15C018350007C3F2 /* ico_next@2x.png in Resources */,
 				84FD723B15C018350007C3F2 /* ico_prev.png in Resources */,
 				84FD723C15C018350007C3F2 /* ico_prev@2x.png in Resources */,
+				84BC907015C2E654004123C3 /* ChoiceCell.xib in Resources */,
+				84BC907515C2EA7B004123C3 /* DoubleChoiceCell.xib in Resources */,
+				84BC907715C2EC15004123C3 /* selected_bg_blue.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -746,6 +768,8 @@
 				841B6FD915BF1149001F1DD7 /* Reachability.m in Sources */,
 				841B6FDD15BF118E001F1DD7 /* SmartAnalyzer.m in Sources */,
 				84FD723215C0177A0007C3F2 /* BrowserViewController.m in Sources */,
+				84BC906F15C2E654004123C3 /* ChoiceCell.m in Sources */,
+				84BC907415C2EA7B004123C3 /* DoubleChoiceCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

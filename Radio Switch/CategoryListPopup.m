@@ -11,6 +11,9 @@
 #import "RequestsManager.h"
 #import "CustomCellBackgroundView.h"
 #import "SmallContentCell.h"
+#import "PreferencesManager.h"
+
+#import "StationsListViewController.h"
 
 @interface CategoryListPopup ()
 
@@ -18,7 +21,7 @@
 
 @implementation CategoryListPopup
 
-@synthesize viewLoaded, tbView, selectedSection;
+@synthesize viewLoaded, tbView, selectedSection, delagate;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -218,6 +221,29 @@
     contentCell.selectedBackgroundView = bgView;
     
     return contentCell;
+}
+
+-(void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *station = [[[[RequestsManager sharedManager].allData 
+                               objectAtIndex:selectedSection] objectForKey: @"stations"]
+                             objectAtIndex: indexPath.row];
+    
+    
+    if ([[PreferencesManager sharedManager].userSelectedStations count] > [PreferencesManager sharedManager].indexToAdd) 
+    {
+        [[PreferencesManager sharedManager].userSelectedStations replaceObjectAtIndex:[PreferencesManager sharedManager].indexToAdd withObject: station];
+    }
+    else
+    {
+        [[PreferencesManager sharedManager].userSelectedStations addObject: station];
+    }
+    
+    [[PreferencesManager sharedManager] saveChanges];
+    
+    [self animateOut];
+    
+    [((StationsListViewController *) self.delagate).navigationController popViewControllerAnimated: YES];
 }
 
 @end

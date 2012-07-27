@@ -11,12 +11,22 @@
 @interface PreferencesManager : NSObject
 {
     NSMutableArray *userAddedStations;
+    
+    NSMutableArray *userSelectedStations;
+    
+    NSInteger indexToAdd;
+    
+    NSMutableArray *songExceptions;
 }
 
-@property (nonatomic, retain) NSMutableArray *userAddedStations;
+@property (nonatomic, retain) NSMutableArray *userAddedStations, *userSelectedStations;
+@property NSInteger indexToAdd;
+@property (nonatomic, retain) NSMutableArray *songExceptions;
 
 +(PreferencesManager *) sharedManager;
 -(void) addStation: (NSDictionary *) newStation;
 -(void) removeStationAtIndex: (NSInteger) index;
+
+-(void) saveChanges;
 
 @end

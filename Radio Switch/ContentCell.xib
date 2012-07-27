@@ -44,7 +44,7 @@
 							<object class="IBUILabel" id="21806301">
 								<reference key="NSNextResponder" ref="871714825"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{46, 9}, {246, 19}}</string>
+								<string key="NSFrame">{{46, 9}, {230, 19}}</string>
 								<reference key="NSSuperview" ref="871714825"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="373514630"/>
@@ -76,7 +76,7 @@
 							<object class="IBUILabel" id="373514630">
 								<reference key="NSNextResponder" ref="871714825"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{46, 30}, {279, 21}}</string>
+								<string key="NSFrame">{{46, 30}, {230, 21}}</string>
 								<reference key="NSSuperview" ref="871714825"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="153461351"/>
@@ -95,7 +95,7 @@
 									<bytes key="NSRGB">MSAxIDEAA</bytes>
 								</object>
 								<int key="IBUIBaselineAdjustment">1</int>
-								<float key="IBUIMinimumFontSize">10</float>
+								<float key="IBUIMinimumFontSize">14</float>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
 									<string key="name">TimesNewRomanPSMT</string>
 									<string key="family">Times New Roman</string>
@@ -114,6 +114,7 @@
 								<string key="NSFrame">{{0, 59}, {300, 1}}</string>
 								<reference key="NSSuperview" ref="871714825"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">2</int>
 									<bytes key="NSRGB">MC42MDAwMDAwMjM4IDAuNjAwMDAwMDIzOCAwLjYwMDAwMDAyMzggMC42NDk5OTk5NzYyAA</bytes>

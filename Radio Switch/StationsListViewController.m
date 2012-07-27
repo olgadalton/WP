@@ -28,6 +28,18 @@
     
     selectedSection = -10;
     
+    if (currentViewType == CustomView) 
+    {
+        if ([[PreferencesManager sharedManager].userAddedStations count] == 0) 
+        {
+            [self.addStationButton setHidden: NO];
+        }
+        else
+        {
+            [self.addStationButton setHidden: YES];
+        }
+    }
+    
     [self.tbView reloadData];
     
     [self.tbView setContentOffset:CGPointMake(0,40)];
@@ -610,6 +622,8 @@
     selectedSection = tag;
     
     self.categoryListView.selectedSection = selectedSection;
+    self.categoryListView.delagate = self;
+    
     [[((AppDelegate *)[[UIApplication sharedApplication] delegate]) window] 
                                         addSubview: self.categoryListView.view];
     
@@ -819,6 +833,38 @@
                 [self.tbView reloadData];
             }
         }
+    }
+    
+    NSDictionary *station = nil;
+    
+    if (currentViewType == ListView) 
+    {
+        if (indexPath.row != 0 && !(indexPath.row == 3 && indexPath.section == selectedSection)) 
+        {
+            station = [[[[RequestsManager sharedManager].allData 
+                            objectAtIndex: indexPath.section] objectForKey: @"stations"] 
+                            objectAtIndex: indexPath.row - 1];
+        }
+    }
+    else if(currentViewType == CustomView)
+    {
+        station = [[PreferencesManager sharedManager].userAddedStations objectAtIndex: indexPath.row];
+    }
+    
+    if (station) 
+    {
+        if ([[PreferencesManager sharedManager].userSelectedStations count] > [PreferencesManager sharedManager].indexToAdd) 
+        {
+            [[PreferencesManager sharedManager].userSelectedStations replaceObjectAtIndex:[PreferencesManager sharedManager].indexToAdd withObject: station];
+        }
+        else
+        {
+            [[PreferencesManager sharedManager].userSelectedStations addObject: station];
+        }
+        
+        [[PreferencesManager sharedManager] saveChanges];
+        
+        [self.navigationController popViewControllerAnimated: YES];
     }
 }
 

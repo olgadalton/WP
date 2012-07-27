@@ -32,6 +32,13 @@
     
     [[RequestsManager sharedManager] loadRadiosListAndSave];
     
+    if (![[NSUserDefaults standardUserDefaults] boolForKey: @"firstTime"]) 
+    {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey: @"skipAds"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey: @"firstTime"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
     return YES;
 }
 

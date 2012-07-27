@@ -18,6 +18,8 @@
     IBOutlet UITableView *tbView;
     
     int selectedSection;
+    
+    id delagate;
 }
 
 @property (nonatomic, readonly) BOOL viewLoaded;
@@ -25,6 +27,8 @@
 @property (nonatomic, retain) IBOutlet UITableView *tbView;
 
 @property int selectedSection;
+
+@property (nonatomic, retain) id delagate;
 
 - (void)animateIn;
 - (void)animateOut;

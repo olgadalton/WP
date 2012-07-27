@@ -10,7 +10,7 @@
 
 @implementation PreferencesManager
 
-@synthesize userAddedStations;
+@synthesize userAddedStations, userSelectedStations, indexToAdd, songExceptions;
 
 static  PreferencesManager *sharedRequestsManager = nil;
 
@@ -52,6 +52,24 @@ static  PreferencesManager *sharedRequestsManager = nil;
         {
             self.userAddedStations = [NSMutableArray array];
         }
+        
+        self.userSelectedStations = [[NSUserDefaults standardUserDefaults] objectForKey: @"preferences"];
+        
+        if (self.userSelectedStations == nil) 
+        {
+            self.userSelectedStations = [NSMutableArray array];
+        }
+        
+        self.songExceptions = [[NSUserDefaults standardUserDefaults] objectForKey: @"songs"];
+        
+        if (self.songExceptions == nil) 
+        {
+            self.songExceptions = [NSMutableArray array];
+        }
+        
+        [self.songExceptions addObject: [NSDictionary dictionaryWithObjectsAndKeys:@"Test song name", @"name", @"Test song singer", @"singer", nil]];
+        
+        [self.songExceptions addObject: [NSDictionary dictionaryWithObjectsAndKeys:@"Test song name 2", @"name", @"Test song singer 2", @"singer", nil]];
     }
     
     return self;
@@ -73,7 +91,14 @@ static  PreferencesManager *sharedRequestsManager = nil;
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
--(void) dealloc
+-(void) saveChanges
+{
+    [[NSUserDefaults standardUserDefaults] setObject: self.userSelectedStations forKey:@"preferences"];
+    [[NSUserDefaults standardUserDefaults] setObject: self.songExceptions forKey: @"songs"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+-(void) delloc
 {
     [userAddedStations release];
     [super dealloc];

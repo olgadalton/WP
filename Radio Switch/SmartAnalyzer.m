@@ -326,6 +326,16 @@ static SmartAnalyzer *sharedAnalyzer = nil;
         return NO;
     }
     
+    if ([url rangeOfString: @"("].location != NSNotFound) 
+    {
+        return NO;
+    }
+    
+    if ([url rangeOfString: @")"].location != NSNotFound) 
+    {
+        return NO;
+    }
+    
     return YES;
 }
 
